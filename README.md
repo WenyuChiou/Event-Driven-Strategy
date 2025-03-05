@@ -1,7 +1,7 @@
 ## Overview
 
 ## Hydraulic Jump Illustration
-![Hydraulic Jump Diagram]()
+![Hydraulic Jump Diagram](download.png)
 
 *Figure 1. Illustration of the Hydraulic Jump Phenomenon.*
 
