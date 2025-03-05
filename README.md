@@ -1,4 +1,10 @@
 ## Overview
+
+## Hydraulic Jump Illustration
+![Hydraulic Jump Diagram]()
+
+*Figure 1. Illustration of the Hydraulic Jump Phenomenon.*
+
 This project focuses on developing a **quantitative trading strategy** for **Taiwan Stock Futures (1-minute interval)** using **Random Forest**. Inspired by the **hydraulic jump** phenomenon in fluid mechanics—where supercritical flow transitions into subcritical flow and creates a sudden increase in water depth—this strategy aims to identify points in the market where **accelerated downward momentum** is followed by a **strong rebound**, or vice versa.
 
 ---
