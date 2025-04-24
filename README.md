@@ -118,11 +118,8 @@ trading_event_prediction/
 │   ├── __init__.py              # Makes package importable
 │   ├── alpha_eric.py            # Alpha factor calculations
 │   ├── FE.py                    # Feature engineering tools
-│   ├── SignalGenerator.py       # Trading signal generation
-│   ├── TAIndicator.py           # Technical indicator config
 │   ├── ModelLoader.py           # Model loading utilities
 │   ├── FuturesFilter.py         # Futures data filtering
-│   └── scraping_and_indicators.py # Data scraping utilities
 │
 ├── examples/                     # Example scripts
 │   ├── basic_example.py         # Basic usage example
