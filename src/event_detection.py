@@ -1,6 +1,5 @@
 import pandas as pd
-import numpy as np
-import talib
+from ta.volatility import AverageTrueRange
 
 def detect_trading_events(data, profit_loss_window=3, atr_window=14, 
                           long_profit_threshold=10.0, short_loss_threshold=-10.0,
@@ -59,10 +58,15 @@ def detect_trading_events(data, profit_loss_window=3, atr_window=14,
         result[col] = result[col].astype('float64')
 
     # 計算ATR
-    result['ATR'] = talib.ATR(result['high'].values, 
-                             result['low'].values, 
-                             result['close'].values, 
-                             timeperiod=atr_window)
+    atr = AverageTrueRange(
+    high=result['high'], 
+    low=result['low'], 
+    close=result['close'], 
+    window=atr_window,
+    fillna=True 
+    )
+    
+    result['ATR'] = atr.average_true_range()
 
     # 初始化Event欄位
     result['Event'] = 0
