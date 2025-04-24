@@ -1,5 +1,5 @@
 import pandas as pd
-from ta.volatility import AverageTrueRange
+
 
 def detect_trading_events(data, profit_loss_window=3, atr_window=14, 
                           long_profit_threshold=10.0, short_loss_threshold=-10.0,
@@ -58,15 +58,18 @@ def detect_trading_events(data, profit_loss_window=3, atr_window=14,
         result[col] = result[col].astype('float64')
 
     # 計算ATR
-    atr = AverageTrueRange(
-    high=result['high'], 
-    low=result['low'], 
-    close=result['close'], 
-    window=atr_window,
-    fillna=True 
-    )
-    
-    result['ATR'] = atr.average_true_range()
+    high = data['high']
+    low = data['low']
+    close = data['close']
+    previous_close = close.shift(1)
+
+    tr1 = high - low
+    tr2 = (high - previous_close).abs()
+    tr3 = (low - previous_close).abs()
+
+    true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+    result['ATR'] = true_range.rolling(window=atr_window).mean()
+
 
     # 初始化Event欄位
     result['Event'] = 0

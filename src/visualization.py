@@ -120,6 +120,7 @@ def visualize_event_summary(data, analysis_results, output_path=None, show_plots
         plt.show()
     else:
         plt.close()
+    return fig
 
 def plot_price_with_event_markers(data, output_path=None, show_plots=True):
     """

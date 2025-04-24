@@ -1,11 +1,5 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.feature_selection import VarianceThreshold
-from sklearn.linear_model import LassoCV
-from ta import add_all_ta_features
-# 導入外部套件
-from package.alpha_eric import AlphaFactory
+# 導入外部套件的 FeatureEngineering 類和計算函數
 from package.FE import FeatureEngineering as PackageFE, calculate_realtime_features
 
 def calculate_features(data, slope_window=3, ema_window=9, 

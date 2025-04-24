@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from ta.trend import EMAIndicator
 from sklearn.preprocessing import MinMaxScaler
 from ta import add_all_ta_features  # 引入 `ta` 技術指標庫
 from sklearn.preprocessing import StandardScaler
@@ -63,11 +62,9 @@ def calculate_realtime_features(
     data['Slope_Change'] = data['Slope_Change'].fillna(0)
 
     # 📌 **Step 6: 計算短期 & 長期 `EMA`**
-    ema_indicator = EMAIndicator(close=data['close'], window=ema_window)
-    long_ema_indicator = EMAIndicator(close=data['close'], window=long_ema_window)
+    data['EMA'] = data['close'].ewm(span=ema_window, adjust=False).mean()
+    data['Long_EMA'] = data['close'].ewm(span=long_ema_window, adjust=False).mean()
 
-    data['EMA'] = ema_indicator.ema_indicator()
-    data['Long_EMA'] = long_ema_indicator.ema_indicator()
 
     # 📌 **Step 7: 計算 `Rebound_Above_EMA, Break_Below_EMA`**
     data['Rebound_Above_EMA'] = data['EMA'] > data['Long_EMA']

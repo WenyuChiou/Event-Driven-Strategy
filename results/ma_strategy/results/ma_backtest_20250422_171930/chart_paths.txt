@@ -1,0 +1,2 @@
+累積損益圖: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\ma_strategy\ma_charts\ma5_profit.png
+高級分析圖: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\ma_strategy\ma_charts\advanced_analysis.png

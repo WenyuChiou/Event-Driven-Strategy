@@ -1,0 +1,46 @@
+Best Strategy Metrics (Long=0.008980, Short=0.002449)
+================================================================================
+
+OVERALL METRICS:
+--------------------
+Total PnL: 360.000000
+Win Rate: 0.523810
+Profit Factor: 1.423032
+Expectancy: 1.714286
+Sharpe Ratio: 1.913992
+Max Drawdown: 101.000000
+Total Trades: 210
+Winning Trades: 110
+Losing Trades: 100
+Average Win: 11.009091
+Average Loss: -8.510000
+Largest Win: 46.000000
+Largest Loss: -44.000000
+Win/Loss Ratio: 1.293665
+Trade Type: all
+
+LONG TRADE METRICS:
+--------------------
+Long Total PnL: 108.000000
+Long Win Rate: 0.565217
+Long Profit Factor: 1.734694
+Long Total Trades: 46
+Long Winning Trades: 26
+Long Losing Trades: 20
+Long Average Win: 9.807692
+Long Average Loss: -7.350000
+Long Largest Win: 28.000000
+Long Largest Loss: -23.000000
+
+SHORT TRADE METRICS:
+--------------------
+Short Total PnL: 252.000000
+Short Win Rate: 0.512195
+Short Profit Factor: 1.357955
+Short Total Trades: 164
+Short Winning Trades: 84
+Short Losing Trades: 80
+Short Average Win: 11.380952
+Short Average Loss: -8.800000
+Short Largest Win: 46.000000
+Short Largest Loss: -44.000000

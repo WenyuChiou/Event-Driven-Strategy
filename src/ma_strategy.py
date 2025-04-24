@@ -5,7 +5,6 @@ import matplotlib.dates as mdates
 import os
 import re
 import seaborn as sns
-import itertools
 from datetime import datetime, time
 
 
@@ -358,7 +357,8 @@ def create_ma_comparison_chart(results, charts_dir, show_plot=False):
 
 def backtest_ma_strategy(data_path, ma_period=5, price_col='Close', save_excel=True, 
                         run_id=None, base_dir=None, custom_path=None, enhanced_charts=True, 
-                        show_plots=True, commission=0.0, point_value=1.0, contract_size=1):
+                        show_plots=True, commission=0.0, point_value=1.0, contract_size=1,
+                        min_hold_periods=5):
     """
     Backtest a 5-day moving average breakout strategy (only cumulative P&L is shown)
 
@@ -481,7 +481,7 @@ def backtest_ma_strategy(data_path, ma_period=5, price_col='Close', save_excel=T
 
     # 生成MA突破交易信號
     print(f"生成MA突破交易信號...")
-    df = generate_ma_signals(df, ma_col=ma_col, price_col=price_col)
+    df = generate_ma_signals(df, ma_col=ma_col, price_col=price_col, min_hold_periods=min_hold_periods)
 
     # 計算點變動
     df['daily_point_change'] = df[price_col].diff()

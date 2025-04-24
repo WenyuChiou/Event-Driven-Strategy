@@ -1,0 +1,59 @@
+Filtered Strategies Summary
+=========================
+
+Filter Criteria:
+- Total PnL > 0
+- Sharpe Ratio > 0
+- PnL/MaxDD > 0
+- Total Trades < 5000
+- Profit Factor > 1.0
+
+Total strategies meeting criteria: 916
+
+Top 5 strategies by Sharpe Ratio:
+
+Rank 1:
+  Long Threshold: 0.004082
+  Short Threshold: 0.001939
+  Sharpe Ratio: 1.4846
+  Total PnL: 876.00
+  Win Rate: 50.78%
+  Profit Factor: 1.0867
+  Max Drawdown: 410.00
+
+Rank 2:
+  Long Threshold: 0.004082
+  Short Threshold: 0.001837
+  Sharpe Ratio: 1.3937
+  Total PnL: 856.00
+  Win Rate: 50.14%
+  Profit Factor: 1.0775
+  Max Drawdown: 420.00
+
+Rank 3:
+  Long Threshold: 0.008367
+  Short Threshold: 0.001939
+  Sharpe Ratio: 1.3849
+  Total PnL: 631.00
+  Win Rate: 51.34%
+  Profit Factor: 1.1077
+  Max Drawdown: 496.00
+
+Rank 4:
+  Long Threshold: 0.004082
+  Short Threshold: 0.001327
+  Sharpe Ratio: 1.3427
+  Total PnL: 969.00
+  Win Rate: 49.40%
+  Profit Factor: 1.0629
+  Max Drawdown: 524.00
+
+Rank 5:
+  Long Threshold: 0.008571
+  Short Threshold: 0.001939
+  Sharpe Ratio: 1.3133
+  Total PnL: 592.00
+  Win Rate: 51.36%
+  Profit Factor: 1.1028
+  Max Drawdown: 493.00
+

@@ -1,0 +1,99 @@
+Backtest Results Report
+Generated on: 2025-04-22 17:48:43
+==================================================
+
+FULL RESULTS SUMMARY
+-------------------------
+Total Trades: 60000
+Total Profit/Loss: 360.00
+Average Trade P/L: 0.01
+
+PERFORMANCE METRICS
+-------------------------
+ALL METRICS:
+Total PnL: 360.0
+Win Rate: 0.5238095238095238
+Profit Factor: 1.4230317273795534
+Expectancy: 1.7142857142857142
+Sharpe Ratio: 1.913991621268178
+Max Drawdown: 101.0
+Total Trades: 210
+Winning Trades: 110
+Losing Trades: 100
+Average Win: 11.00909090909091
+Average Loss: -8.51
+Largest Win: 46.0
+Largest Loss: -44.0
+Win/Loss Ratio: 1.2936652067086851
+Trade Type: all
+Long Total PnL: 108.0
+Long Win Rate: 0.5652173913043478
+Long Profit Factor: 1.7346938775510203
+Long Total Trades: 46
+Long Winning Trades: 26
+Long Losing Trades: 20
+Long Average Win: 9.807692307692308
+Long Average Loss: -7.35
+Long Largest Win: 28.0
+Long Largest Loss: -23.0
+Short Total PnL: 252.0
+Short Win Rate: 0.5121951219512195
+Short Profit Factor: 1.3579545454545454
+Short Total Trades: 164
+Short Winning Trades: 84
+Short Losing Trades: 80
+Short Average Win: 11.380952380952381
+Short Average Loss: -8.8
+Short Largest Win: 46.0
+Short Largest Loss: -44.0
+
+LONG METRICS:
+Total PnL: 108.0
+Win Rate: 0.5652173913043478
+Profit Factor: 1.7346938775510203
+Expectancy: 2.347826086956522
+Sharpe Ratio: 1.4989465839763365
+Max Drawdown: 34.0
+Total Trades: 46
+Winning Trades: 26
+Losing Trades: 20
+Average Win: 9.807692307692308
+Average Loss: -7.35
+Largest Win: 28.0
+Largest Loss: -23.0
+Win/Loss Ratio: 1.3343799058084773
+Trade Type: long
+
+SHORT METRICS:
+Total PnL: 252.0
+Win Rate: 0.5121951219512195
+Profit Factor: 1.3579545454545454
+Expectancy: 1.5365853658536586
+Sharpe Ratio: 1.4479056436724123
+Max Drawdown: 95.0
+Total Trades: 164
+Winning Trades: 84
+Losing Trades: 80
+Average Win: 11.380952380952381
+Average Loss: -8.8
+Largest Win: 46.0
+Largest Loss: -44.0
+Win/Loss Ratio: 1.2932900432900432
+Trade Type: short
+
+LONG TRADES
+-------------------------
+Total Long Trades: 46
+Total Long Trade P/L: 108.00
+Average Long Trade P/L: 2.35
+Best Long Trade: 28.00
+Worst Long Trade: -23.00
+
+SHORT TRADES
+-------------------------
+Total Short Trades: 164
+Total Short Trade P/L: 252.00
+Average Short Trade P/L: 1.54
+Best Short Trade: 46.00
+Worst Short Trade: -44.00
+

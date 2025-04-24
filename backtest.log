@@ -1,0 +1,222 @@
+2025-04-22 17:37:17,303 - INFO - Loading model: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\lightgbm.joblib
+2025-04-22 17:37:17,333 - INFO - Loading scaler: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\scaler.joblib
+2025-04-22 17:37:17,342 - INFO - Loading feature list: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\features.xlsx
+2025-04-22 17:37:17,491 - INFO - Reading backtest data: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\data\raw\TX00_validation.xlsx
+2025-04-22 17:37:19,440 - INFO - Calculating technical indicators...
+2025-04-22 17:38:35,331 - INFO - Transforming features...
+2025-04-22 17:38:36,398 - INFO - Running model predictions...
+2025-04-22 17:38:36,833 - INFO - Plotting probability distribution...
+2025-04-22 17:38:59,907 - INFO - 
+Starting backtest parameter optimization...
+2025-04-22 17:48:43,144 - INFO - Best parameters: {'long_threshold': 0.008979591836734694, 'short_threshold': 0.0024489795918367346}
+2025-04-22 17:48:43,144 - INFO - Best performance (Sharpe Ratio): 1.9140
+2025-04-22 17:48:43,145 - INFO - 
+Running backtest with best parameters...
+2025-04-22 17:48:43,341 - INFO - 
+=== ALL TRADE METRICS ===
+2025-04-22 17:48:43,341 - INFO -   Total PnL: 360.0000
+2025-04-22 17:48:43,341 - INFO -   Win Rate: 0.5238
+2025-04-22 17:48:43,342 - INFO -   Profit Factor: 1.4230
+2025-04-22 17:48:43,342 - INFO -   Expectancy: 1.7143
+2025-04-22 17:48:43,342 - INFO -   Sharpe Ratio: 1.9140
+2025-04-22 17:48:43,342 - INFO -   Max Drawdown: 101.0000
+2025-04-22 17:48:43,342 - INFO -   Total Trades: 210.0000
+2025-04-22 17:48:43,342 - INFO -   Winning Trades: 110.0000
+2025-04-22 17:48:43,342 - INFO -   Losing Trades: 100.0000
+2025-04-22 17:48:43,343 - INFO -   Average Win: 11.0091
+2025-04-22 17:48:43,343 - INFO -   Average Loss: -8.5100
+2025-04-22 17:48:43,343 - INFO -   Largest Win: 46.0000
+2025-04-22 17:48:43,343 - INFO -   Largest Loss: -44.0000
+2025-04-22 17:48:43,343 - INFO -   Win/Loss Ratio: 1.2937
+2025-04-22 17:48:43,343 - INFO -   Trade Type: all
+2025-04-22 17:48:43,343 - INFO -   Long Total PnL: 108.0000
+2025-04-22 17:48:43,343 - INFO -   Long Win Rate: 0.5652
+2025-04-22 17:48:43,343 - INFO -   Long Profit Factor: 1.7347
+2025-04-22 17:48:43,343 - INFO -   Long Total Trades: 46.0000
+2025-04-22 17:48:43,343 - INFO -   Long Winning Trades: 26.0000
+2025-04-22 17:48:43,343 - INFO -   Long Losing Trades: 20.0000
+2025-04-22 17:48:43,344 - INFO -   Long Average Win: 9.8077
+2025-04-22 17:48:43,344 - INFO -   Long Average Loss: -7.3500
+2025-04-22 17:48:43,344 - INFO -   Long Largest Win: 28.0000
+2025-04-22 17:48:43,344 - INFO -   Long Largest Loss: -23.0000
+2025-04-22 17:48:43,344 - INFO -   Short Total PnL: 252.0000
+2025-04-22 17:48:43,344 - INFO -   Short Win Rate: 0.5122
+2025-04-22 17:48:43,344 - INFO -   Short Profit Factor: 1.3580
+2025-04-22 17:48:43,344 - INFO -   Short Total Trades: 164.0000
+2025-04-22 17:48:43,345 - INFO -   Short Winning Trades: 84.0000
+2025-04-22 17:48:43,345 - INFO -   Short Losing Trades: 80.0000
+2025-04-22 17:48:43,345 - INFO -   Short Average Win: 11.3810
+2025-04-22 17:48:43,345 - INFO -   Short Average Loss: -8.8000
+2025-04-22 17:48:43,345 - INFO -   Short Largest Win: 46.0000
+2025-04-22 17:48:43,345 - INFO -   Short Largest Loss: -44.0000
+2025-04-22 17:48:43,345 - INFO - 
+=== LONG TRADE METRICS ===
+2025-04-22 17:48:43,345 - INFO -   Total PnL: 108.0000
+2025-04-22 17:48:43,346 - INFO -   Win Rate: 0.5652
+2025-04-22 17:48:43,346 - INFO -   Profit Factor: 1.7347
+2025-04-22 17:48:43,346 - INFO -   Expectancy: 2.3478
+2025-04-22 17:48:43,346 - INFO -   Sharpe Ratio: 1.4989
+2025-04-22 17:48:43,346 - INFO -   Max Drawdown: 34.0000
+2025-04-22 17:48:43,346 - INFO -   Total Trades: 46.0000
+2025-04-22 17:48:43,346 - INFO -   Winning Trades: 26.0000
+2025-04-22 17:48:43,346 - INFO -   Losing Trades: 20.0000
+2025-04-22 17:48:43,346 - INFO -   Average Win: 9.8077
+2025-04-22 17:48:43,347 - INFO -   Average Loss: -7.3500
+2025-04-22 17:48:43,347 - INFO -   Largest Win: 28.0000
+2025-04-22 17:48:43,347 - INFO -   Largest Loss: -23.0000
+2025-04-22 17:48:43,347 - INFO -   Win/Loss Ratio: 1.3344
+2025-04-22 17:48:43,347 - INFO -   Trade Type: long
+2025-04-22 17:48:43,347 - INFO - 
+=== SHORT TRADE METRICS ===
+2025-04-22 17:48:43,347 - INFO -   Total PnL: 252.0000
+2025-04-22 17:48:43,347 - INFO -   Win Rate: 0.5122
+2025-04-22 17:48:43,347 - INFO -   Profit Factor: 1.3580
+2025-04-22 17:48:43,347 - INFO -   Expectancy: 1.5366
+2025-04-22 17:48:43,348 - INFO -   Sharpe Ratio: 1.4479
+2025-04-22 17:48:43,348 - INFO -   Max Drawdown: 95.0000
+2025-04-22 17:48:43,348 - INFO -   Total Trades: 164.0000
+2025-04-22 17:48:43,348 - INFO -   Winning Trades: 84.0000
+2025-04-22 17:48:43,348 - INFO -   Losing Trades: 80.0000
+2025-04-22 17:48:43,348 - INFO -   Average Win: 11.3810
+2025-04-22 17:48:43,348 - INFO -   Average Loss: -8.8000
+2025-04-22 17:48:43,348 - INFO -   Largest Win: 46.0000
+2025-04-22 17:48:43,349 - INFO -   Largest Loss: -44.0000
+2025-04-22 17:48:43,349 - INFO -   Win/Loss Ratio: 1.2933
+2025-04-22 17:48:43,349 - INFO -   Trade Type: short
+2025-04-22 17:48:43,354 - INFO - Results exported to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\backtest_results_20250422_173717.txt
+2025-04-22 17:48:43,354 - INFO - 
+Filtering and comparing strategy combinations based on criteria...
+2025-04-22 17:59:26,220 - INFO - Found 1217 parameter combinations meeting the criteria
+2025-04-22 17:59:26,221 - INFO - 
+Top 10 best parameter combinations:
+2025-04-22 17:59:26,224 - INFO - 
+ Long Threshold  Short Threshold  Total PnL  Sharpe Ratio  Win Rate  Profit Factor  Max Drawdown  PnL/MaxDD  Total Trades
+       0.008980         0.002449      360.0      1.913992  0.523810       1.423032         101.0   3.564356           210
+       0.009184         0.002449      340.0      1.817099  0.521739       1.402844         101.0   3.366337           207
+       0.008980         0.001735      546.0      1.768579  0.503975       1.205418         224.0   2.437500           629
+       0.009388         0.002449      328.0      1.763526  0.519802       1.395657         101.0   3.247525           202
+       0.008776         0.002449      337.0      1.757607  0.515837       1.367102         101.0   3.336634           221
+       0.009592         0.002449      320.0      1.741198  0.512690       1.397022         105.0   3.047619           197
+       0.008980         0.001633      586.0      1.711365  0.507171       1.178877         245.0   2.391837           767
+       0.009184         0.001735      526.0      1.707328  0.503195       1.198416         224.0   2.348214           626
+       0.008367         0.002449      338.0      1.700851  0.518828       1.336653          99.0   3.414141           239
+       0.008776         0.001735      523.0      1.682371  0.501563       1.191927         224.0   2.334821           640
+2025-04-22 17:59:26,224 - INFO - 
+Creating visualizations for filtered strategies...
+2025-04-22 17:59:42,521 - INFO - Filtered strategy visualizations saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\figures\20250422_173717\filtered_strategies
+2025-04-22 17:59:55,773 - INFO - Parameter optimization results saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\optimization_results_20250422_173717.xlsx
+2025-04-22 17:59:55,775 - INFO - Best parameters saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\best_params_20250422_173717.txt
+2025-04-22 17:59:55,776 - INFO - 
+Second-best parameter combination: Long Threshold=0.009184, Short Threshold=0.002449
+2025-04-22 17:59:55,776 - INFO - Sharpe Ratio: 1.8171, Profit Factor: 1.4028
+2025-04-22 21:37:54,869 - INFO - Loading model: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\lightgbm.joblib
+2025-04-22 21:37:54,903 - INFO - Loading scaler: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\scaler.joblib
+2025-04-22 21:37:54,910 - INFO - Loading feature list: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\models\features.xlsx
+2025-04-22 21:37:55,060 - INFO - Reading backtest data: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\data\raw\TX00_validation.xlsx
+2025-04-22 21:37:56,972 - INFO - Calculating technical indicators...
+2025-04-22 21:39:14,459 - INFO - Transforming features...
+2025-04-22 21:39:15,550 - INFO - Running model predictions...
+2025-04-22 21:39:16,166 - INFO - Plotting probability distribution...
+2025-04-22 21:42:04,319 - INFO - 
+Starting backtest parameter optimization...
+2025-04-22 21:52:33,847 - INFO - Best parameters: {'long_threshold': 0.004081632653061225, 'short_threshold': 0.0019387755102040817}
+2025-04-22 21:52:33,847 - INFO - Best performance (Sharpe Ratio): 1.4846
+2025-04-22 21:52:33,847 - INFO - 
+Running backtest with best parameters...
+2025-04-22 21:52:34,098 - INFO - 
+=== ALL TRADE METRICS ===
+2025-04-22 21:52:34,098 - INFO -   Total PnL: 876.0000
+2025-04-22 21:52:34,099 - INFO -   Win Rate: 0.5078
+2025-04-22 21:52:34,099 - INFO -   Profit Factor: 1.0867
+2025-04-22 21:52:34,099 - INFO -   Expectancy: 0.3881
+2025-04-22 21:52:34,099 - INFO -   Sharpe Ratio: 1.4846
+2025-04-22 21:52:34,099 - INFO -   Max Drawdown: 410.0000
+2025-04-22 21:52:34,099 - INFO -   Total Trades: 2257.0000
+2025-04-22 21:52:34,099 - INFO -   Winning Trades: 1146.0000
+2025-04-22 21:52:34,099 - INFO -   Losing Trades: 1111.0000
+2025-04-22 21:52:34,100 - INFO -   Average Win: 9.5838
+2025-04-22 21:52:34,100 - INFO -   Average Loss: -9.0972
+2025-04-22 21:52:34,100 - INFO -   Largest Win: 49.0000
+2025-04-22 21:52:34,100 - INFO -   Largest Loss: -50.0000
+2025-04-22 21:52:34,100 - INFO -   Win/Loss Ratio: 1.0535
+2025-04-22 21:52:34,100 - INFO -   Trade Type: all
+2025-04-22 21:52:34,100 - INFO -   Long Total PnL: 426.0000
+2025-04-22 21:52:34,100 - INFO -   Long Win Rate: 0.5041
+2025-04-22 21:52:34,100 - INFO -   Long Profit Factor: 1.0711
+2025-04-22 21:52:34,100 - INFO -   Long Total Trades: 1349.0000
+2025-04-22 21:52:34,100 - INFO -   Long Winning Trades: 680.0000
+2025-04-22 21:52:34,100 - INFO -   Long Losing Trades: 669.0000
+2025-04-22 21:52:34,100 - INFO -   Long Average Win: 9.4426
+2025-04-22 21:52:34,100 - INFO -   Long Average Loss: -8.9611
+2025-04-22 21:52:34,100 - INFO -   Long Largest Win: 49.0000
+2025-04-22 21:52:34,101 - INFO -   Long Largest Loss: -50.0000
+2025-04-22 21:52:34,101 - INFO -   Short Total PnL: 450.0000
+2025-04-22 21:52:34,101 - INFO -   Short Win Rate: 0.5132
+2025-04-22 21:52:34,101 - INFO -   Short Profit Factor: 1.1094
+2025-04-22 21:52:34,101 - INFO -   Short Total Trades: 908.0000
+2025-04-22 21:52:34,101 - INFO -   Short Winning Trades: 466.0000
+2025-04-22 21:52:34,101 - INFO -   Short Losing Trades: 442.0000
+2025-04-22 21:52:34,101 - INFO -   Short Average Win: 9.7897
+2025-04-22 21:52:34,101 - INFO -   Short Average Loss: -9.3032
+2025-04-22 21:52:34,101 - INFO -   Short Largest Win: 49.0000
+2025-04-22 21:52:34,101 - INFO -   Short Largest Loss: -46.0000
+2025-04-22 21:52:34,101 - INFO - 
+=== LONG TRADE METRICS ===
+2025-04-22 21:52:34,101 - INFO -   Total PnL: 426.0000
+2025-04-22 21:52:34,101 - INFO -   Win Rate: 0.5041
+2025-04-22 21:52:34,101 - INFO -   Profit Factor: 1.0711
+2025-04-22 21:52:34,101 - INFO -   Expectancy: 0.3158
+2025-04-22 21:52:34,102 - INFO -   Sharpe Ratio: 0.9442
+2025-04-22 21:52:34,102 - INFO -   Max Drawdown: 407.0000
+2025-04-22 21:52:34,102 - INFO -   Total Trades: 1349.0000
+2025-04-22 21:52:34,102 - INFO -   Winning Trades: 680.0000
+2025-04-22 21:52:34,102 - INFO -   Losing Trades: 669.0000
+2025-04-22 21:52:34,102 - INFO -   Average Win: 9.4426
+2025-04-22 21:52:34,102 - INFO -   Average Loss: -8.9611
+2025-04-22 21:52:34,102 - INFO -   Largest Win: 49.0000
+2025-04-22 21:52:34,102 - INFO -   Largest Loss: -50.0000
+2025-04-22 21:52:34,102 - INFO -   Win/Loss Ratio: 1.0537
+2025-04-22 21:52:34,102 - INFO -   Trade Type: long
+2025-04-22 21:52:34,102 - INFO - 
+=== SHORT TRADE METRICS ===
+2025-04-22 21:52:34,102 - INFO -   Total PnL: 450.0000
+2025-04-22 21:52:34,102 - INFO -   Win Rate: 0.5132
+2025-04-22 21:52:34,102 - INFO -   Profit Factor: 1.1094
+2025-04-22 21:52:34,103 - INFO -   Expectancy: 0.4956
+2025-04-22 21:52:34,103 - INFO -   Sharpe Ratio: 1.1829
+2025-04-22 21:52:34,103 - INFO -   Max Drawdown: 376.0000
+2025-04-22 21:52:34,103 - INFO -   Total Trades: 908.0000
+2025-04-22 21:52:34,103 - INFO -   Winning Trades: 466.0000
+2025-04-22 21:52:34,103 - INFO -   Losing Trades: 442.0000
+2025-04-22 21:52:34,103 - INFO -   Average Win: 9.7897
+2025-04-22 21:52:34,103 - INFO -   Average Loss: -9.3032
+2025-04-22 21:52:34,103 - INFO -   Largest Win: 49.0000
+2025-04-22 21:52:34,103 - INFO -   Largest Loss: -46.0000
+2025-04-22 21:52:34,103 - INFO -   Win/Loss Ratio: 1.0523
+2025-04-22 21:52:34,103 - INFO -   Trade Type: short
+2025-04-22 21:52:34,125 - INFO - Results exported to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\backtest_results_20250422_213754.txt
+2025-04-22 21:52:34,125 - INFO - 
+Filtering and comparing strategy combinations based on criteria...
+2025-04-22 22:04:46,362 - INFO - Found 916 parameter combinations meeting the criteria
+2025-04-22 22:04:46,363 - INFO - 
+Top 10 best parameter combinations:
+2025-04-22 22:04:46,366 - INFO - 
+ Long Threshold  Short Threshold  Total PnL  Sharpe Ratio  Win Rate  Profit Factor  Max Drawdown  PnL/MaxDD  Total Trades
+       0.004082         0.001939      876.0      1.484617  0.507754       1.086673         410.0   2.136585          2257
+       0.004082         0.001837      856.0      1.393744  0.501414       1.077515         420.0   2.038095          2475
+       0.008367         0.001939      631.0      1.384921  0.513365       1.107661         496.0   1.272177          1272
+       0.004082         0.001327      969.0      1.342702  0.493962       1.062930         524.0   1.849237          3478
+       0.008571         0.001939      592.0      1.313262  0.513622       1.102760         493.0   1.200811          1248
+       0.008776         0.001939      581.0      1.290781  0.512571       1.101840         508.0   1.143701          1233
+       0.004082         0.002245      675.0      1.277062  0.507667       1.082589         489.0   1.380368          1826
+       0.008367         0.001837      611.0      1.255981  0.502013       1.089893         550.0   1.110909          1490
+       0.004082         0.002857      599.0      1.245830  0.505078       1.090524         421.0   1.422803          1477
+       0.004082         0.000102      584.0      1.209626  0.506157       1.085630         428.0   1.364486          1543
+2025-04-22 22:04:46,366 - INFO - 
+Creating visualizations for filtered strategies...
+2025-04-22 22:04:54,286 - INFO - Filtered strategy visualizations saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\figures\20250422_213754\filtered_strategies
+2025-04-22 22:05:11,277 - INFO - Parameter optimization results saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\optimization_results_20250422_213754.xlsx
+2025-04-22 22:05:11,280 - INFO - Best parameters saved to: C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\backtests\best_params_20250422_213754.txt
+2025-04-22 22:05:11,280 - INFO - 
+Second-best parameter combination: Long Threshold=0.004082, Short Threshold=0.001837
+2025-04-22 22:05:11,281 - INFO - Sharpe Ratio: 1.3937, Profit Factor: 1.0775

@@ -1,0 +1,46 @@
+Long Threshold: 0.004081632653061225
+Short Threshold: 0.0019387755102040817
+
+Backtest Metrics:
+Total PnL: 876.0
+Win Rate: 0.5077536552946389
+Profit Factor: 1.0866726031463343
+Expectancy: 0.38812583074878154
+Sharpe Ratio: 1.4846172668822393
+Max Drawdown: 410.0
+Total Trades: 2257
+Winning Trades: 1146
+Losing Trades: 1111
+Average Win: 9.583769633507853
+Average Loss: -9.097209720972097
+Largest Win: 49.0
+Largest Loss: -50.0
+Win/Loss Ratio: 1.0534845218984095
+Trade Type: all
+Long Total PnL: 426.0
+Long Win Rate: 0.5040770941438102
+Long Profit Factor: 1.0710592160133445
+Long Total Trades: 1349
+Long Winning Trades: 680
+Long Losing Trades: 669
+Long Average Win: 9.44264705882353
+Long Average Loss: -8.961136023916293
+Long Largest Win: 49.0
+Long Largest Loss: -50.0
+Short Total PnL: 450.0
+Short Win Rate: 0.513215859030837
+Short Profit Factor: 1.1094357976653697
+Short Total Trades: 908
+Short Winning Trades: 466
+Short Losing Trades: 442
+Short Average Win: 9.78969957081545
+Short Average Loss: -9.30316742081448
+Short Largest Win: 49.0
+Short Largest Loss: -46.0
+
+Strategies meeting criteria: 916
+
+Top three strategy parameters:
+Rank 1020: Long Threshold=0.004082, Short Threshold=0.001939, Sharpe Ratio=1.4846, Profit Factor=1.0867
+Rank 1019: Long Threshold=0.004082, Short Threshold=0.001837, Sharpe Ratio=1.3937, Profit Factor=1.0775
+Rank 2070: Long Threshold=0.008367, Short Threshold=0.001939, Sharpe Ratio=1.3849, Profit Factor=1.1077

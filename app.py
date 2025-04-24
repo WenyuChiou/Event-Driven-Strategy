@@ -317,7 +317,7 @@ elif app_mode == "Model Training":
             
             with col2:
                 trials = st.slider("Hyperparameter Tuning Trials", 10, 500, 100)
-                splits = st.slider("Spilt size", 1, 10, 10, 0.05)
+                splits = st.slider("Split size", 1, 10, 5, 1)
             
             if st.button("Start Model Training"):
                 st.info(f"Hyperparameter tuning for {model_type} model...")
