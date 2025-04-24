@@ -1,5 +1,3 @@
-pip install "PyYAML==6.0" --only-binary :all:
-
 
 # Core dependencies
 numpy>=1.19.5
