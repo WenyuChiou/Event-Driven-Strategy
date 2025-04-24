@@ -14,7 +14,7 @@ lightgbm>=3.2.0
 catboost>=0.26.0
 
 # Optimization
-optuna>=2.10.0
+optuna==3.4.0
 
 # Data handling and storage
 joblib>=1.0.0
