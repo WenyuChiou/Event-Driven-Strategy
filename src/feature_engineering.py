@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import talib
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LassoCV
