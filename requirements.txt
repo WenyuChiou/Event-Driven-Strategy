@@ -6,7 +6,6 @@ seaborn>=0.11.0
 scikit-learn>=0.24.0
 
 # Technical analysis
-<<<<<<< HEAD
 ta>=0.7.0
 
 # Machine learning models
