@@ -27,11 +27,8 @@ from src.visualization import *
 # 從 package 資料夾導入所需模組
 from package.alpha_eric import *  # 假設 package 目錄下有這些模組
 from package.FE import *
-from package.SignalGenerator import *
-from package.TAIndicator import *
 from package.ModelLoader import *
 from package.FuturesFilter import * 
-from package.scraping_and_indicators import *
 # 從 examples 資料夾導入所需模組
 from examples.backtesting_example import *  
 # from examples.basic_example import *
