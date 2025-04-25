@@ -30,7 +30,7 @@ def parse_arguments():
     
     # Model settings
     parser.add_argument('--model', type=str, default='lightgbm', 
-                      choices=['randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost'],
+                      choices=['randomforest', 'gradientboosting', 'xgboost', 'lightgbm'],
                       help='Model type')
     parser.add_argument('--model-path', type=str, help='Trained model path')
     parser.add_argument('--feature-path', type=str, help='Feature list path')

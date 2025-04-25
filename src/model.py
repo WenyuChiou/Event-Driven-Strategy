@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
-from catboost import CatBoostClassifier
+
 
 
 
@@ -24,15 +24,14 @@ class BayesianOptimizerWrapper:
         Parameters:
         -----------
         model_name : str
-            模型名稱，支援 'randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost'
+            模型名稱，支援 'randomforest', 'gradientboosting', 'xgboost', 'lightgbm'
         """
         # 模型名稱映射 (將 TradingModel 的模型名稱映射到 ModelLoader 的模型名稱)
         self.model_name_map = {
             'randomforest': 'random_forest',
             'gradientboosting': None,  # ModelLoader 不直接支援 gradientboosting
             'xgboost': 'xgboost',
-            'lightgbm': 'lightgbm',
-            'catboost': 'catboost'
+            'lightgbm': 'lightgbm'
         }
         
         self.model_name = model_name.lower()
@@ -140,7 +139,7 @@ class BayesianOptimizer:
         -----------
         model_name : str
             The name of the model. Supported models include 'randomforest', 'gradientboosting', 'xgboost', 
-            'lightgbm', and 'catboost'.
+            'lightgbm'
         """
         self.model_name = model_name.lower()
         self.search_space = self._get_search_space()
@@ -149,7 +148,7 @@ class BayesianOptimizer:
         self.weights = None
         self.feature_importances = None
         self.supported_models = [
-            'randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost'
+            'randomforest', 'gradientboosting', 'xgboost', 'lightgbm'
         ]
         
         if self.model_name not in self.supported_models:
@@ -193,12 +192,6 @@ class BayesianOptimizer:
                 'num_leaves': (20, 150),
                 'subsample': (0.5, 1.0),
                 'colsample_bytree': (0.5, 1.0)
-            },
-            'catboost': {
-                'iterations': (50, 300),
-                'learning_rate': (0.01, 0.3),
-                'depth': (3, 10),
-                'l2_leaf_reg': (1, 10)
             }
         }
         return search_spaces.get(self.model_name, {})
@@ -226,8 +219,7 @@ class BayesianOptimizer:
             model_name_map = {
                 'randomforest': 'random_forest',
                 'xgboost': 'xgboost',
-                'lightgbm': 'lightgbm',
-                'catboost': 'catboost'
+                'lightgbm': 'lightgbm'
             }
             
             if self.model_name in model_name_map:
@@ -282,12 +274,6 @@ class BayesianOptimizer:
                 'num_leaves': 31,
                 'subsample': 0.8,
                 'colsample_bytree': 0.8
-            },
-            'catboost': {
-                'iterations': 100,
-                'learning_rate': 0.1,
-                'depth': 5,
-                'l2_leaf_reg': 3
             }
         }
         
@@ -317,7 +303,7 @@ class BayesianOptimizer:
         model.fit(X, y)
         
         # Retrieve feature importances.
-        if self.model_name in ['randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost']:
+        if self.model_name in ['randomforest', 'gradientboosting', 'xgboost', 'lightgbm']:
             self.feature_importances = model.feature_importances_
     
     def get_best_params_and_weights(self):
@@ -359,8 +345,6 @@ class BayesianOptimizer:
             return XGBClassifier(**self.best_params, random_state=42)
         elif self.model_name == 'lightgbm':
             return LGBMClassifier(**self.best_params, random_state=42, num_class=num)
-        elif self.model_name == 'catboost':
-            return CatBoostClassifier(**self.best_params, random_state=42)
         else:
             raise ValueError(f"Unsupported model: {self.model_name}")
 
@@ -376,7 +360,7 @@ class TradingModel:
         -----------
         model_name : str, default='lightgbm'
             The model name. Supported models include 'randomforest', 'gradientboosting', 'xgboost', 
-            'lightgbm', and 'catboost'.
+            'lightgbm'
         params : dict, optional
             Model parameters. If None, default parameters will be used.
         """
@@ -385,7 +369,7 @@ class TradingModel:
         self.model = None
         self.feature_names = None
         self.supported_models = [
-            'randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost'
+            'randomforest', 'gradientboosting', 'xgboost', 'lightgbm'
         ]
         
         if self.model_name not in self.supported_models:
@@ -569,8 +553,6 @@ class TradingModel:
             return XGBClassifier(**(self.params or {}), random_state=42)
         elif self.model_name == 'lightgbm':
             return LGBMClassifier(**(self.params or {}), random_state=42)
-        elif self.model_name == 'catboost':
-            return CatBoostClassifier(**(self.params or {}), random_state=42)
         else:
             raise ValueError(f"Unsupported model: {self.model_name}")
 
@@ -623,8 +605,7 @@ class TradingModel:
             'RandomForestClassifier': 'randomforest',
             'GradientBoostingClassifier': 'gradientboosting',
             'XGBClassifier': 'xgboost',
-            'LGBMClassifier': 'lightgbm',
-            'CatBoostClassifier': 'catboost'
+            'LGBMClassifier': 'lightgbm'
         }
         
         model_name = model_name_map.get(model_type, 'unknown')
@@ -701,7 +682,7 @@ class TradingModelOptimizer:
         y : array-like
             目標數據
         model_name : str, default='lightgbm'
-            模型名稱，支援 'randomforest', 'xgboost', 'lightgbm', 'catboost'
+            模型名稱，支援 'randomforest', 'xgboost', 'lightgbm'
         n_splits : int, default=5
             交叉驗證分割數
         n_trials : int, default=100
@@ -716,7 +697,7 @@ class TradingModelOptimizer:
         """
         # 檢查模型名稱
         model_name = model_name.lower()
-        supported_models = ['randomforest', 'xgboost', 'lightgbm', 'catboost']
+        supported_models = ['randomforest', 'xgboost', 'lightgbm']
         
         if model_name not in supported_models:
             raise ValueError(f"不支援的模型: {model_name}. 支援的模型有: {supported_models}")

@@ -191,7 +191,7 @@ def train_model(data_path, model_name='lightgbm', n_trials=100):
 if __name__ == "__main__":
     # 設定參數
     data_path = os.path.join(data_dir,'raw', "TX00_training.xlsx")
-    model_name = 'lightgbm'  # 可選: 'randomforest', 'gradientboosting', 'xgboost', 'lightgbm', 'catboost'
+    model_name = 'lightgbm'  # 可選: 'randomforest', 'gradientboosting', 'xgboost', 'lightgbm'
     n_trials = 10  # 實際使用時建議設為 100 或更高
     
     # 訓練模型

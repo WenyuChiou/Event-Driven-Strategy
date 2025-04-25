@@ -48,16 +48,7 @@ class HyperparameterConfig:
                 'reg_alpha': FloatDistribution(1e-4, 1e-1),
                 'reg_lambda': FloatDistribution(1e-4, 1e-1),
             }
-        elif model_name == "catboost":
-            return {
-                'learning_rate': FloatDistribution(1e-4, 1e-1),
-                'iterations': IntDistribution(50, 600),
-                'depth': IntDistribution(3, 12),
-                'l2_leaf_reg': FloatDistribution(1e-4, 1e-1),
-                'border_count': IntDistribution(32, 255),
-                'bagging_temperature': FloatDistribution(0.0, 1.0),
-            }
-        
+
         elif model_name == "residual_lstm":
             return {
                 'hidden_size': IntDistribution(32, 512),  # 隱藏層大小
@@ -248,9 +239,6 @@ class BayesianOptimizer:
         elif self.model_name == "lightgbm":
             from lightgbm import LGBMRegressor
             return LGBMRegressor(random_state=42, **params)
-        elif self.model_name == "catboost":
-            from catboost import CatBoostRegressor
-            return CatBoostRegressor(verbose=0, **params)
         elif self.model_name == "residual_lstm":
             input_size = params.get("input_size", 10)  # 默認輸入特徵數
             output_size = params.get("output_size", 1)  # 默認輸出維度
