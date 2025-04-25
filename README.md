@@ -17,30 +17,24 @@ This project was inspired by the hydraulic jump phenomenon in fluid dynamics, wh
 
 A hydraulic jump occurs when a fast-flowing fluid (supercritical flow) suddenly slows down and rises in height, converting to subcritical flow. This phenomenon is observable in rivers, spillways, and open channels.
 
-<<<<<<< HEAD
-![Hydraulic Jump Diagram](Fig/HJ.png)
-*Figure 1: Illustration of a hydraulic jump in an open channel.*
-=======
+
 <p align="center">
   <img src="Fig/HJ.png" alt="Hydraulic Jump Diagram" width="600"><br>
   <em>Figure 1: Illustration of a hydraulic jump in an open channel.</em>
 </p>
->>>>>>> main
+
 
 In financial markets, similar behavior can be observed:
 1. **Slow Price Decline**: Analogous to the gradual flow before the critical point
 2. **Rapid Price Decline**: Corresponds to the high-velocity flow
 3. **Hydraulic Jump**: The point where the market suddenly reverses direction after a rapid decline
 
-<<<<<<< HEAD
-![Market Hydraulic Jump Example](Fig/example.png)
-*Figure 2: Example of a market "hydraulic jump" where a rapid price decline is followed by a sudden reversal.*
-=======
+
 <p align="center">
   <img src="Fig/example.png" alt="Market Hydraulic Jump Example" width="600"><br>
   <em>Figure 2: Example of a market “hydraulic jump” where a rapid price decline is followed by a sudden reversal.</em>
 </p>
->>>>>>> main
+
 
 This natural phenomenon provides the theoretical foundation for our trading strategy, especially for identifying potential reversal points after rapid market declines.
 
