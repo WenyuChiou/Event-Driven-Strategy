@@ -40,14 +40,21 @@ class AlphaFactory:
             A, B, theta = 1/2, 2, 1
             
         if type is None:
-            
             for day in days:
-                X = self.data['close'].rolling(window=day).apply(lambda x: (x.iloc[-1] - x.iloc[0]) / x.iloc[0] * 100)
-                self.data[f'utility_{day}_type1'] = X.apply(lambda x: x**(A) if x >= 0 else -theta * (x ** (B) ))
+                # Vectorized calculation: percentage change over rolling window
+                X = self.data['close'].pct_change(periods=day) * 100
+                # Vectorized utility function application
+                mask_positive = X >= 0
+                result = np.where(mask_positive, X ** A, -theta * (np.abs(X) ** B))
+                self.data[f'utility_{day}_type1'] = result
         else:
             for day in days:
-                X = self.data['close'].rolling(window=day).apply(lambda x: (x.iloc[-1] - x.iloc[0]) / x.iloc[0] * 100)
-                self.data[f'utility_{day}_type2'] = X.apply(lambda x: np.log(x) if x >= 0 else -theta * (x ** (B) ))
+                # Vectorized calculation: percentage change over rolling window
+                X = self.data['close'].pct_change(periods=day) * 100
+                # Vectorized utility function application
+                mask_positive = X >= 0
+                result = np.where(mask_positive, np.log(np.maximum(X, 1e-10)), -theta * (np.abs(X) ** B))
+                self.data[f'utility_{day}_type2'] = result
                 
         return self.data
 
@@ -66,7 +73,9 @@ class AlphaFactory:
         """
         for day in days:
             price_diff = self.data['close'].diff(day)
-            self.data[f'prospect_{day}'] = price_diff.apply(lambda x: weight * x if x < 0 else (1 - weight) * x)
+            # Vectorized: apply weight based on sign
+            mask_negative = price_diff < 0
+            self.data[f'prospect_{day}'] = np.where(mask_negative, weight * price_diff, (1 - weight) * price_diff)
         return self.data
 
     def alpha03(self, days=list, risk_aversion=1.5):
@@ -85,7 +94,9 @@ class AlphaFactory:
         """
         for day in days:
             price_diff = self.data['close'].diff(day)
-            self.data[f'risk_aversion_{day}'] = price_diff.apply(lambda x: (abs(x) ** risk_aversion) * (-1 if x < 0 else 1))
+            # Vectorized: apply risk aversion function
+            sign = np.sign(price_diff)
+            self.data[f'risk_aversion_{day}'] = (np.abs(price_diff) ** risk_aversion) * sign
         return self.data
 
     def alpha04(self, days=list):
