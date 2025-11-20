@@ -69,34 +69,59 @@ def parse_arguments():
 
 def main():
     """Main program entry point"""
-    args = parse_arguments()
+    from src.logger import setup_logger
+    get_logger = lambda name: setup_logger(name)
+    from src.validation import ValidationError, validate_file_path, validate_model_type
     
-    # Set data directory and model directory
-    data_dir = os.path.join(src_path, 'data', 'raw')
-    models_dir = os.path.join(src_path, 'models')
+    logger = get_logger("main")
     
-    # Ensure directories exist
-    for directory in [data_dir, models_dir]:
-        os.makedirs(directory, exist_ok=True)
-    
-    # Process argument overrides
-    save_excel = not args.no_excel if hasattr(args, 'no_excel') else args.save_excel
-    separate_long_short = not args.no_separate_analysis if hasattr(args, 'no_separate_analysis') else args.separate_long_short
-    enhanced_charts = not args.simple_charts if hasattr(args, 'simple_charts') else args.enhanced_charts
-    show_plots = not args.no_show_plots if hasattr(args, 'no_show_plots') else True
-    
-    # Generate run_id if not provided
-    run_id = args.run_id if args.run_id else datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    # If no data path is provided, use default path
-    if args.data is None:
-        args.data = os.path.join(data_dir, "TX00_training.xlsx")
-    
-    if args.validation_data is None:
-        args.validation_data = os.path.join(data_dir, "TX00_validation.xlsx")
+    try:
+        args = parse_arguments()
+        
+        # Set data directory and model directory
+        data_dir = os.path.join(src_path, 'data', 'raw')
+        models_dir = os.path.join(src_path, 'models')
+        
+        # Ensure directories exist
+        for directory in [data_dir, models_dir]:
+            os.makedirs(directory, exist_ok=True)
+        
+        # Process argument overrides
+        save_excel = not args.no_excel if hasattr(args, 'no_excel') else args.save_excel
+        separate_long_short = not args.no_separate_analysis if hasattr(args, 'no_separate_analysis') else args.separate_long_short
+        enhanced_charts = not args.simple_charts if hasattr(args, 'simple_charts') else args.enhanced_charts
+        show_plots = not args.no_show_plots if hasattr(args, 'no_show_plots') else True
+        
+        # Generate run_id if not provided
+        run_id = args.run_id if args.run_id else datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Validate and set data paths
+        if args.data is None:
+            args.data = os.path.join(data_dir, "TX00_training.xlsx")
+        else:
+            validate_file_path(args.data, must_exist=True, allowed_extensions=['.xlsx', '.csv'])
+        
+        if args.validation_data is None:
+            args.validation_data = os.path.join(data_dir, "TX00_validation.xlsx")
+        else:
+            validate_file_path(args.validation_data, must_exist=True, allowed_extensions=['.xlsx', '.csv'])
+        
+        # Validate model type if specified
+        if args.mode in ['train', 'backtest', 'comprehensive', 'simulate', 'all']:
+            validate_model_type(args.model, allowed_types=['randomforest', 'gradientboosting', 'xgboost', 'lightgbm'])
+        
+    except ValidationError as e:
+        logger.error(f"Validation error: {str(e)}")
+        print(f"Error: {str(e)}")
+        return 1
+    except Exception as e:
+        logger.error(f"Unexpected error during initialization: {str(e)}", exc_info=True)
+        print(f"Unexpected error: {str(e)}")
+        return 1
     
     # Handle MA strategy mode
     if args.mode == 'ma_strategy':
+        logger.info("Starting MA Strategy Backtest")
         print("\n===== Starting MA Strategy Backtest =====")
         
         # Set custom save path using dynamic path construction
@@ -105,6 +130,11 @@ def main():
             os.makedirs(custom_path, exist_ok=True)
         
         try:
+            # Validate input parameters
+            from src.validation import validate_numeric_parameter
+            validate_numeric_parameter(args.ma_period, 'ma_period', min_value=1, max_value=500)
+            validate_numeric_parameter(args.commission, 'commission', min_value=0.0)
+            
             # Run MA strategy backtest, unpack returned tuple
             metrics_result, df_result = backtest_ma_strategy(
                 data_path=args.validation_data,
@@ -129,121 +159,199 @@ def main():
                 else:
                     print(f"{key}: {value}")
             
+        except ValidationError as e:
+            logger.error(f"Validation error in MA strategy: {str(e)}")
+            print(f"\nValidation error: {str(e)}")
+            return 1
+        except FileNotFoundError as e:
+            logger.error(f"File not found: {str(e)}")
+            print(f"\nFile not found: {str(e)}")
+            return 1
         except Exception as e:
+            logger.error(f"Error occurred while executing MA strategy: {str(e)}", exc_info=True)
             print(f"\nError occurred while executing MA strategy: {str(e)}")
             print("Using simplified cumulative return comparison...")
             
-            ma_periods = [3, 5, 10, 15, 20, 30, 50]
-            chart_path, results = create_cumulative_comparison_chart(
-                args.validation_data, 
-                ma_periods=ma_periods,
-                price_col=args.price_col,
-                custom_path=custom_path
-            )
-            
-            print(f"\nCumulative profit/loss comparison chart saved to: {chart_path}")
+            try:
+                ma_periods = [3, 5, 10, 15, 20, 30, 50]
+                chart_path, results = create_cumulative_comparison_chart(
+                    args.validation_data, 
+                    ma_periods=ma_periods,
+                    price_col=args.price_col,
+                    custom_path=custom_path
+                )
+                
+                print(f"\nCumulative profit/loss comparison chart saved to: {chart_path}")
+            except Exception as e2:
+                logger.error(f"Failed to create fallback chart: {str(e2)}")
+                print(f"Failed to create fallback chart: {str(e2)}")
+                return 1
         
+        logger.info("MA Strategy backtest completed successfully")
         print("\nMA Strategy backtest completed successfully!")
         print("\nProgram execution completed!")
-        return
+        return 0
     
     # Execute selected mode for ML model
-    if args.mode in ['train', 'all']:
-        print("\n===== Starting Model Training =====")
-        model, feature_engineering, metrics = train_model(args.data, args.model, args.trials)
+    try:
+        if args.mode in ['train', 'all']:
+            logger.info("Starting Model Training")
+            print("\n===== Starting Model Training =====")
+            
+            try:
+                model, feature_engineering, metrics = train_model(args.data, args.model, args.trials)
+                
+                # If 'all' mode, save model path for subsequent steps
+                if args.mode == 'all':
+                    args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
+                    args.feature_path = os.path.join(models_dir, f"features.xlsx")
+                    args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
+            except FileNotFoundError as e:
+                logger.error(f"Training data file not found: {str(e)}")
+                print(f"Error: Training data file not found: {str(e)}")
+                return 1
+            except Exception as e:
+                logger.error(f"Error during model training: {str(e)}", exc_info=True)
+                print(f"Error during model training: {str(e)}")
+                return 1
         
-        # If 'all' mode, save model path for subsequent steps
-        if args.mode == 'all':
-            args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
-            args.feature_path = os.path.join(models_dir, f"features.xlsx")
-            args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
-    
-    if args.mode in ['backtest', 'all']:
-        print("\n===== Starting Model Backtesting =====")
+        if args.mode in ['backtest', 'all']:
+            logger.info("Starting Model Backtesting")
+            print("\n===== Starting Model Backtesting =====")
+            
+            # Set default paths if not specified
+            if args.model_path is None:
+                args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
+            if args.feature_path is None:
+                args.feature_path = os.path.join(models_dir, f"features.xlsx")
+            if args.scaler_path is None:
+                args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
+            
+            # Validate model files exist
+            try:
+                validate_file_path(args.model_path, must_exist=True)
+                validate_file_path(args.feature_path, must_exist=True)
+                validate_file_path(args.scaler_path, must_exist=True)
+            except ValidationError as e:
+                logger.error(f"Model file validation error: {str(e)}")
+                print(f"Error: {str(e)}")
+                return 1
+            
+            try:
+                # Use the enhanced backtest_model function with new parameters
+                metrics = backtest_model(
+                    args.model_path, 
+                    args.feature_path, 
+                    args.scaler_path, 
+                    args.validation_data,
+                    run_id=run_id,
+                    base_dir=src_path,
+                    save_excel=save_excel,
+                    separate_long_short=separate_long_short,
+                    enhanced_charts=enhanced_charts,
+                    show_plots=show_plots
+                )
+                
+                logger.info("Backtest completed successfully")
+                print("\nBacktest completed successfully!")
+            except Exception as e:
+                logger.error(f"Error during backtesting: {str(e)}", exc_info=True)
+                print(f"Error during backtesting: {str(e)}")
+                return 1
         
-        # Set default paths if not specified
-        if args.model_path is None:
-            args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
-        if args.feature_path is None:
-            args.feature_path = os.path.join(models_dir, f"features.xlsx")
-        if args.scaler_path is None:
-            args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
+        if args.mode in ['comprehensive', 'all']:
+            logger.info("Starting Comprehensive Backtesting")
+            print("\n===== Starting Comprehensive Backtesting (Training + Validation) =====")
+            
+            # Set default paths if not specified
+            if args.model_path is None:
+                args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
+            if args.feature_path is None:
+                args.feature_path = os.path.join(models_dir, f"features.xlsx")
+            if args.scaler_path is None:
+                args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
+            
+            try:
+                # Run comprehensive backtest
+                training_metrics, validation_metrics = run_comprehensive_backtest(
+                    args.model_path, 
+                    args.feature_path, 
+                    args.scaler_path, 
+                    args.data,  # Training data
+                    args.validation_data,
+                    base_dir=src_path,
+                    save_excel=save_excel,
+                    separate_long_short=separate_long_short,
+                    enhanced_charts=enhanced_charts,
+                    show_plots=show_plots
+                )
+                
+                logger.info("Comprehensive backtest completed successfully")
+                print("\nComprehensive backtest completed successfully!")
+            except Exception as e:
+                logger.error(f"Error during comprehensive backtesting: {str(e)}", exc_info=True)
+                print(f"Error during comprehensive backtesting: {str(e)}")
+                return 1
         
-        # Use the enhanced backtest_model function with new parameters
-        metrics = backtest_model(
-            args.model_path, 
-            args.feature_path, 
-            args.scaler_path, 
-            args.validation_data,
-            run_id=run_id,
-            base_dir=src_path,
-            save_excel=save_excel,
-            separate_long_short=separate_long_short,
-            enhanced_charts=enhanced_charts,
-            show_plots=show_plots
-        )
+        if args.mode in ['simulate', 'all']:
+            logger.info("Starting Real-time Trading Simulation")
+            print("\n===== Starting Real-time Trading Simulation =====")
+            
+            # Set default paths if not specified
+            if args.model_path is None:
+                args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
+            if args.feature_path is None:
+                args.feature_path = os.path.join(models_dir, f"features.xlsx")
+            if args.scaler_path is None:
+                args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
+            
+            # Validate thresholds
+            try:
+                from src.validation import validate_probability_threshold
+                validate_probability_threshold(args.long_threshold, 'long_threshold')
+                validate_probability_threshold(args.short_threshold, 'short_threshold')
+            except ValidationError as e:
+                logger.error(f"Threshold validation error: {str(e)}")
+                print(f"Error: {str(e)}")
+                return 1
+            
+            try:
+                # Run real-time trading simulation with enhanced parameters
+                trade_df = simulate_real_time_trading(
+                    args.model_path, 
+                    args.feature_path, 
+                    args.scaler_path, 
+                    args.validation_data, 
+                    args.long_threshold, 
+                    args.short_threshold,
+                    run_id=run_id,
+                    base_dir=src_path,
+                    save_excel=save_excel,
+                    enhanced_charts=enhanced_charts,
+                    show_plots=show_plots
+                )
+                
+                if trade_df is not None and len(trade_df) > 0:
+                    logger.info("Simulation completed successfully")
+                    print("\nSimulation completed successfully!")
+                else:
+                    logger.warning("Simulation completed but no trades were generated")
+                    print("\nSimulation completed, but no trades were generated with the specified thresholds.")
+            except Exception as e:
+                logger.error(f"Error during simulation: {str(e)}", exc_info=True)
+                print(f"Error during simulation: {str(e)}")
+                return 1
         
-        print("\nBacktest completed successfully!")
-    
-    if args.mode in ['comprehensive', 'all']:
-        print("\n===== Starting Comprehensive Backtesting (Training + Validation) =====")
+        logger.info("Program execution completed successfully")
+        print("\nProgram execution completed!")
+        return 0
         
-        # Set default paths if not specified
-        if args.model_path is None:
-            args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
-        if args.feature_path is None:
-            args.feature_path = os.path.join(models_dir, f"features.xlsx")
-        if args.scaler_path is None:
-            args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
-        
-        # Run comprehensive backtest
-        training_metrics, validation_metrics = run_comprehensive_backtest(
-            args.model_path, 
-            args.feature_path, 
-            args.scaler_path, 
-            args.data,  # Training data
-            args.validation_data,
-            base_dir=src_path,
-            save_excel=save_excel,
-            separate_long_short=separate_long_short,
-            enhanced_charts=enhanced_charts,
-            show_plots=show_plots
-        )
-        
-        print("\nComprehensive backtest completed successfully!")
-    
-    if args.mode in ['simulate', 'all']:
-        print("\n===== Starting Real-time Trading Simulation =====")
-        
-        # Set default paths if not specified
-        if args.model_path is None:
-            args.model_path = os.path.join(models_dir, f"{args.model}.joblib")
-        if args.feature_path is None:
-            args.feature_path = os.path.join(models_dir, f"features.xlsx")
-        if args.scaler_path is None:
-            args.scaler_path = os.path.join(models_dir, f"scaler.joblib")
-        
-        # Run real-time trading simulation with enhanced parameters
-        trade_df = simulate_real_time_trading(
-            args.model_path, 
-            args.feature_path, 
-            args.scaler_path, 
-            args.validation_data, 
-            args.long_threshold, 
-            args.short_threshold,
-            run_id=run_id,
-            base_dir=src_path,
-            save_excel=save_excel,
-            enhanced_charts=enhanced_charts,
-            show_plots=show_plots
-        )
-        
-        if trade_df is not None and len(trade_df) > 0:
-            print("\nSimulation completed successfully!")
-        else:
-            print("\nSimulation completed, but no trades were generated with the specified thresholds.")
-    
-    print("\nProgram execution completed!")
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+        print(f"\nUnexpected error: {str(e)}")
+        return 1
 
 if __name__ == "__main__":
-    main()
+    import sys
+    exit_code = main()
+    sys.exit(exit_code if exit_code is not None else 0)

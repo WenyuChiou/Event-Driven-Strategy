@@ -7,12 +7,16 @@ import json
 from datetime import datetime
 import textwrap
 
-# 引入自定義模組
+# Import custom modules
 from src.event_detection import detect_trading_events, analyze_trading_events
 from src.feature_engineering import calculate_features, FeatureEngineeringWrapper
 from src.model import *
 from src.visualization import visualize_event_summary, plot_price_with_event_markers
 from src.utils import export_event_summary
+from src.logger import setup_logger
+
+# Setup logger
+logger = setup_logger("model_training")
 
 # 設定路徑
 data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
@@ -142,11 +146,11 @@ def train_model(data_path, model_name='lightgbm', n_trials=100):
     with open(params_filename, 'w') as f:
         json.dump(best_params, f)
     
-    print(f"\nModel training completed.")
-    print(f"Model saved to: {model_filename}")
-    print(f"Scaler saved to: {scaler_filename}")
-    print(f"Feature list saved to: {features_filename}")
-    print(f"Parameters saved to: {params_filename}")
+    logger.info(f"\nModel training completed.")
+    logger.info(f"Model saved to: {model_filename}")
+    logger.info(f"Scaler saved to: {scaler_filename}")
+    logger.info(f"Feature list saved to: {features_filename}")
+    logger.info(f"Parameters saved to: {params_filename}")
     
     # 10. Plot Top 10 Feature Importances with wrapped labels
     # Get indices of the top 10 features by importance
@@ -197,4 +201,4 @@ if __name__ == "__main__":
     # 訓練模型
     model, feature_engineering, metrics = train_model(data_path, model_name, n_trials)
     
-    print("\n訓練完成！")
+    logger.info("\nTraining completed!")
