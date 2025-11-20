@@ -1328,7 +1328,7 @@ class AlphaFactory:
             
             current_volume = self.data["volume"]
             
-            # 預期影響特徵計算
+            # Anticipation effect feature calculation
             self.data[f"anticipation_effect_{day}"] = (
                 historical_price_change * current_volume
             ) * anticipation_effect_factor
@@ -2136,28 +2136,28 @@ class AlphaFactory:
             close = self.data['close']
             volume = self.data['volume']
             
-            # 计算收盘价的简单移动平均（SMA）
+            # Calculate Simple Moving Average (SMA) of closing price
             sma_close = close.rolling(window=day).mean()
             
-            # 计算布林带上下轨
+            # Calculate Bollinger Band upper and lower bounds
             rolling_std = close.rolling(window=day).std()
             upper_band = sma_close + 2 * rolling_std
             lower_band = sma_close - 2 * rolling_std
             bb_percent = (close - lower_band) / (upper_band - lower_band)
             
-            # 计算成交量的移动平均
+            # Calculate moving average of volume
             volume_mean = volume.rolling(window=day).mean()
             
-            # 计算价格变动（高低差）
+            # Calculate price movement (high-low difference)
             price_range = high - low
             
-            # 计算alpha因子
+            # Calculate alpha factor
             alpha = (bb_percent * volume_mean * price_range) * anticipation_effect_factor
             
-            # 填充缺失值
+            # Fill missing values
             alpha = alpha.fillna(0)
             
-            # 将结果添加到数据中
+            # Add result to data
             self.data[f'alpha111_{day}'] = alpha
         return self.data
 
@@ -2166,34 +2166,34 @@ class AlphaFactory:
 
     def alpha112(self, days=[10, 20], volume_window=15, bb_window=20, anticipation_effect_factor=0.6):
         """
-        Alpha112：綜合多個技術指標來捕捉價格變動趨勢。
+        Alpha112: Combines multiple technical indicators to capture price movement trends.
         
-        參數:
-        - days (list): 用於計算不同時間窗口的時間間隔。
-        - volume_window (int): 成交量的滾動窗口週期。
-        - bb_window (int): 布林帶的滾動窗口週期。
-        - anticipation_effect_factor (float): 因子，用於縮放預期影響（默認為0.6）。
+        Parameters:
+        - days (list): Time intervals for calculating different time windows.
+        - volume_window (int): Rolling window period for volume.
+        - bb_window (int): Rolling window period for Bollinger Bands.
+        - anticipation_effect_factor (float): Factor for scaling anticipation effect (default: 0.6).
         
-        返回:
-        - df (pd.DataFrame): 返回包含新特徵的數據。
+        Returns:
+        - df (pd.DataFrame): Returns data containing new features.
         """
         for day in days:
-            # 計算短期和長期指數移動平均線 (EMA)
+            # Calculate short-term and long-term Exponential Moving Average (EMA)
             ema_short = self.data['close'].ewm(span=day, min_periods=1).mean()
-            ema_long = self.data['close'].ewm(span=day*2, min_periods=1).mean()  # 假設長期為短期的兩倍
+            ema_long = self.data['close'].ewm(span=day*2, min_periods=1).mean()  # Assume long-term is twice the short-term
             macd = ema_short - ema_long
 
-            # 計算布林帶上下界
+            # Calculate Bollinger Band upper and lower bounds
             rolling_mean = self.data['close'].rolling(window=bb_window).mean()
             rolling_std = self.data['close'].rolling(window=bb_window).std()
             bb_upper = rolling_mean + (2 * rolling_std)
             bb_lower = rolling_mean - (2 * rolling_std)
             bb_width = bb_upper - bb_lower
 
-            # 計算成交量的滾動平均值
+            # Calculate rolling average of volume
             volume_mean = self.data['volume'].rolling(window=volume_window).mean()
 
-            # 綜合計算：考慮價格變動的綜合因子
+            # Comprehensive calculation: comprehensive factor considering price movements
             self.data[f'alpha112_{day}'] = (
                 macd * bb_width * volume_mean
             ) * anticipation_effect_factor
@@ -2216,10 +2216,10 @@ class AlphaFactory:
             close = self.data['close']
             volume = self.data['volume']
             
-            # 计算价格变动（高低差）
+            # Calculate price movement (high-low difference)
             price_range = high - low
             
-            # 计算收盘价与高低差的比例
+            # Calculate ratio of closing price to high-low difference
             price_ratio = close / price_range
             
             # 计算成交量的移动平均

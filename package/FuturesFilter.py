@@ -5,10 +5,10 @@ from dateutil.relativedelta import relativedelta
 class FuturesFilter:
     def __init__(self, data):
         """
-        初始化FuturesFilter類別。
+        Initialize FuturesFilter class.
 
-        參數：
-        - data (pd.DataFrame): 包含時間索引和期貨價格的資料。
+        Parameters:
+        - data (pd.DataFrame): DataFrame containing time index and futures prices.
         """
         if not isinstance(data.index, pd.DatetimeIndex):
             raise ValueError("Data must have a DatetimeIndex.")
@@ -16,37 +16,37 @@ class FuturesFilter:
 
     def adjust_to_next_weekday(self, date_str):
         """
-        確認輸入的日期是否是周末，如果是，調整到下一個周一。
+        Check if the input date is a weekend, and if so, adjust to the next Monday.
 
-        參數：
-        - date_str (str): 原始日期字串，格式為 YYYYMMDD。
+        Parameters:
+        - date_str (str): Original date string in YYYYMMDD format.
 
-        回傳：
-        - str: 調整後的日期字串，格式為 YYYYMMDD。
+        Returns:
+        - str: Adjusted date string in YYYYMMDD format.
         """
         date_dt = datetime.strptime(date_str, "%Y%m%d")
-        if date_dt.weekday() == 5:  # 星期六
-            date_dt += timedelta(days=2)  # 調整到周一
-        elif date_dt.weekday() == 6:  # 星期天
-            date_dt += timedelta(days=1)  # 調整到周一
+        if date_dt.weekday() == 5:  # Saturday
+            date_dt += timedelta(days=2)  # Adjust to Monday
+        elif date_dt.weekday() == 6:  # Sunday
+            date_dt += timedelta(days=1)  # Adjust to Monday
         return date_dt.strftime("%Y%m%d")
 
     def filter_by_dates_and_time(self, dates, session=None, night_session=False):
         """
-        根據多個日期和交易時段過濾資料。
+        Filter data based on multiple dates and trading sessions.
 
-        參數：
-        - dates (list of str): 要篩選的日期列表（格式：YYYY-MM-DD）。
-        - session (str or None): 指定的交易時段（"morning", "afternoon", "evening"）。如果為 None，僅根據日期過濾。
-        - night_session (bool): 如果為 True，將以指定日期的前一天晚上至給定日期的凌晨篩選夜盤資料。
+        Parameters:
+        - dates (list of str): List of dates to filter (format: YYYY-MM-DD).
+        - session (str or None): Specified trading session ("morning", "afternoon", "evening"). If None, filter only by date.
+        - night_session (bool): If True, filter night session data from the previous day evening to the given date early morning.
 
-        回傳：
-        - pd.DataFrame: 移除指定日期和時段的資料。
+        Returns:
+        - pd.DataFrame: Data with specified dates and sessions removed.
         """
         date_set = set(pd.to_datetime(dates).date)
 
         if night_session:
-            # 過濾夜盤資料（前一天22:30至指定日期05:00）
+            # Filter night session data (previous day 22:30 to specified date 05:00)
             mask = ~self.data.index.to_series().apply(
                 lambda dt: any(
                     (dt >= pd.Timestamp(d) - pd.Timedelta(days=1, hours=1, minutes=30) + pd.Timedelta(hours=22) and
@@ -56,12 +56,12 @@ class FuturesFilter:
             )
             filtered_data = self.data[mask]
         else:
-            # 僅過濾日期
+            # Filter by date only
             mask = ~self.data.index.map(lambda x: x.date()).isin(date_set)
             filtered_data = self.data[mask]
 
         if session is not None:
-            # 過濾指定交易時段
+            # Filter specified trading session
             if session == "morning":
                 time_mask = (filtered_data.index.time < pd.to_datetime('08:45').time()) | \
                             (filtered_data.index.time > pd.to_datetime('13:30').time())

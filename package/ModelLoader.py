@@ -13,7 +13,7 @@ from sklearn.model_selection import TimeSeriesSplit
 
 class HyperparameterConfig:
     """
-    儲存不同機器學習模型和深度學習模型的超參數配置。
+    Store hyperparameter configurations for different machine learning and deep learning models.
     """
     @staticmethod
     def get_params(model_name):
@@ -51,11 +51,11 @@ class HyperparameterConfig:
 
         elif model_name == "residual_lstm":
             return {
-                'hidden_size': IntDistribution(32, 512),  # 隱藏層大小
-                'num_layers': IntDistribution(1, 5),     # LSTM 層數
-                'dropout': FloatDistribution(0.1, 0.5),  # Dropout 比例
-                'learning_rate': FloatDistribution(1e-4, 1e-2),  # 學習率
-                'batch_size': IntDistribution(16, 128),  # 批次大小
+                'hidden_size': IntDistribution(32, 512),  # Hidden layer size
+                'num_layers': IntDistribution(1, 5),     # Number of LSTM layers
+                'dropout': FloatDistribution(0.1, 0.5),  # Dropout ratio
+                'learning_rate': FloatDistribution(1e-4, 1e-2),  # Learning rate
+                'batch_size': IntDistribution(16, 128),  # Batch size
             }
 
         elif model_name == "transformer":
@@ -89,7 +89,7 @@ class HyperparameterConfig:
                 'epochs': IntDistribution(10, 200),
             }
         else:
-            raise ValueError(f"未知的模型名稱: {model_name}")
+            raise ValueError(f"Unknown model name: {model_name}")
 
 
 
@@ -97,23 +97,23 @@ class HyperparameterConfig:
 class BayesianOptimizer:
     def __init__(self, model_name, metric=None):
         """
-        初始化貝葉斯優化器。
+        Initialize Bayesian optimizer.
         
-        :param model_name: str, 模型名稱（需與 HyperparameterConfig 中的方法名稱對應）。
-        :param metric: callable, 自定義損失函數，例如 mean_squared_error。如果為 None，默認使用負均方誤差。
+        :param model_name: str, Model name (must correspond to method names in HyperparameterConfig).
+        :param metric: callable, Custom loss function, e.g., mean_squared_error. If None, defaults to negative mean squared error.
         """
         self.model_name = model_name
         self.metric = metric or mean_squared_error
         self.param_space = HyperparameterConfig.get_params(model_name)
-        self.feature_importances_ = None  # 用於存儲特徵重要性
+        self.feature_importances_ = None  # Used to store feature importances
 
     def fit(self, X, y, n_splits=5, n_trials=50, random_state=42):
         """
-        使用 TimeSeriesCV 和貝葉斯優化進行超參數調整，並計算特徵權重。
+        Perform hyperparameter tuning using TimeSeriesCV and Bayesian optimization, and calculate feature weights.
         """
 
         def objective(trial):
-            # 生成參數
+            # Generate parameters
             params = {
                 key: trial.suggest_categorical(key, value) if isinstance(value, list)
                 else trial.suggest_float(key, value.low, value.high) if isinstance(value, FloatDistribution)
@@ -121,7 +121,7 @@ class BayesianOptimizer:
                 for key, value in self.param_space.items()
             }
 
-            # 調用模型
+            # Call model
             model = self._get_model(params)
             tscv = TimeSeriesSplit(n_splits=n_splits)
             errors = []
@@ -130,9 +130,9 @@ class BayesianOptimizer:
                 X_train, X_val = X[train_idx], X[val_idx]
                 y_train, y_val = y[train_idx], y[val_idx]
 
-                if isinstance(model, nn.Module):  # LSTM 或 PyTorch 模型
+                if isinstance(model, nn.Module):  # LSTM or PyTorch model
                     errors.append(self._train_lstm(model, X_train, y_train, X_val, y_val, params))
-                else:  # 傳統機器學習模型
+                else:  # Traditional machine learning model
                     model.fit(X_train, y_train)
                     y_pred = model.predict(X_val)
                     errors.append(self.metric(y_val, y_pred))
@@ -146,10 +146,10 @@ class BayesianOptimizer:
         self.best_params = self.study.best_params
         self.best_score = self.study.best_value
 
-        print("最佳參數:", self.best_params)
-        print("最佳得分:", self.best_score)
+        print("Best parameters:", self.best_params)
+        print("Best score:", self.best_score)
 
-        # 訓練最佳模型並計算特徵重要性
+        # Train best model and calculate feature importance
         best_model = self._get_model(self.best_params)
         if isinstance(best_model, nn.Module):
             self._train_lstm(best_model, X, y, None, None, self.best_params, full_train=True)
@@ -161,11 +161,11 @@ class BayesianOptimizer:
         if hasattr(best_model, "feature_importances_"):
             self.feature_importances_ = best_model.feature_importances_
         else:
-            print("該模型不支持特徵重要性提取。")
+            print("This model does not support feature importance extraction.")
 
     def _train_lstm(self, model, X_train, y_train, X_val, y_val, params, full_train=False):
         """
-        專為 LSTM 設計的訓練函數，包括驗證和完整訓練。
+        Training function specifically designed for LSTM, including validation and full training.
         """
         import torch
         from torch.utils.data import DataLoader, TensorDataset
@@ -173,7 +173,7 @@ class BayesianOptimizer:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
 
-        # 構建 DataLoader
+        # Build DataLoader
         def get_dataloader(X, y, batch_size):
             X_tensor = torch.tensor(X, dtype=torch.float32)
             y_tensor = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
@@ -187,7 +187,7 @@ class BayesianOptimizer:
         optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'])
         criterion = nn.MSELoss()
 
-        # 訓練模型
+        # Train model
         epochs = params.get("epochs", 10)
         for epoch in range(epochs):
             model.train()
@@ -201,7 +201,7 @@ class BayesianOptimizer:
                 optimizer.step()
                 train_loss += loss.item()
 
-            # 驗證模型
+            # Validate model
             if val_loader is not None:
                 model.eval()
                 val_loss = 0
@@ -214,22 +214,22 @@ class BayesianOptimizer:
 
                 print(f"Epoch {epoch + 1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
 
-        # 如果是完整訓練模式（full_train=True），不返回驗證損失
+        # If in full training mode (full_train=True), do not return validation loss
         if full_train:
             return
 
-        # 返回驗證損失
+        # Return validation loss
         return val_loss / len(val_loader)
 
 
 
     def _get_model(self, params):
         """
-        根據模型名稱和參數返回對應的模型實例。
+        Return corresponding model instance based on model name and parameters.
         
-        :param params: dict, 模型的超參數。
+        :param params: dict, Model hyperparameters.
 
-        :return: 模型實例。
+        :return: Model instance.
         """
         if self.model_name == "random_forest":
             return RandomForestRegressor(random_state=42, **params)
@@ -240,8 +240,8 @@ class BayesianOptimizer:
             from lightgbm import LGBMRegressor
             return LGBMRegressor(random_state=42, **params)
         elif self.model_name == "residual_lstm":
-            input_size = params.get("input_size", 10)  # 默認輸入特徵數
-            output_size = params.get("output_size", 1)  # 默認輸出維度
+            input_size = params.get("input_size", 10)  # Default number of input features
+            output_size = params.get("output_size", 1)  # Default output dimension
             hidden_size = params["hidden_size"]
             num_layers = params["num_layers"]
             dropout = params["dropout"]
@@ -277,40 +277,40 @@ class BayesianOptimizer:
             return model
         elif self.model_name == "mamba":
             # Mamba model instantiation placeholder (replace with actual implementation if available)
-            raise NotImplementedError("Mamba 模型尚未實現，請替換為具體實現邏輯。")
+            raise NotImplementedError("Mamba model not yet implemented, please replace with specific implementation logic.")
         elif self.model_name == "custom":
-            # 支持從外部匯入的自定義模型
+            # Support custom models imported from external sources
             model_class = params.get('model_class')
             if not model_class:
-                raise ValueError("當使用 'custom' 模型時，必須在 params 中提供 'model_class'。")
+                raise ValueError("When using 'custom' model, 'model_class' must be provided in params.")
             return model_class(**params)
         else:
-            raise ValueError(f"未知的模型名稱: {self.model_name}")
+            raise ValueError(f"Unknown model name: {self.model_name}")
 
 
 
     def get_feature_importances(self):
         """
-        返回特徵的重要性。
+        Return feature importances.
         
-        :return: np.array, 特徵重要性數據。
+        :return: np.array, Feature importance data.
         """
         if self.feature_importances_ is not None:
             return self.feature_importances_
         else:
-            raise ValueError("特徵重要性尚未計算，請確保在訓練後調用該方法。")
+            raise ValueError("Feature importances have not been calculated yet. Please ensure this method is called after training.")
 
     def get_best_params_and_weights(self):
         """
-        返回最佳參數和權重（此處權重等於每個超參數的貢獻比例）。
+        Return best parameters and weights (here weights equal the contribution ratio of each hyperparameter).
         
-        :return: tuple, 包含最佳參數和權重的字典。
+        :return: tuple, Dictionary containing best parameters and weights.
         """
         total = sum(self.best_params.values()) if all(isinstance(v, (int, float)) for v in self.best_params.values()) else None
         if total:
             weights = {key: value / total for key, value in self.best_params.items()}
         else:
-            weights = {key: None for key in self.best_params.keys()}  # 無法計算權重時返回 None
+            weights = {key: None for key in self.best_params.keys()}  # Return None when weights cannot be calculated
         return self.best_params, weights
 
 class ResidualLSTMModel(nn.Module):

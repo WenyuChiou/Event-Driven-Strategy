@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from ta import add_all_ta_features  # 引入 `ta` 技術指標庫
+from ta import add_all_ta_features  # Import `ta` technical indicators library
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LassoCV
@@ -11,27 +11,27 @@ def calculate_realtime_features(
     data, slope_window=3, ema_window=9, avg_vol_window=9, long_ema_window=13, scaler=None
 ):
     """
-    **即時特徵計算**
-    1. 計算 `ta` 技術指標
-    2. 計算 Bollinger Bands
-    3. 計算 `Lower_Band_Slope` 和 `Normalized_Slope`
-    4. 計算 `Slope_Change`
-    5. 計算 `EMA`, `Long_EMA`
-    6. 計算 `Rebound_Above_EMA`（突破短期均線）
-    7. 計算 `Long_EMA_Downward`（長期趨勢下降）
-    8. 計算 `Average_Volatility`
-    9. **不判斷 `Event`，適用於即時數據**
+    **Real-time Feature Calculation**
+    1. Calculate `ta` technical indicators
+    2. Calculate Bollinger Bands
+    3. Calculate `Lower_Band_Slope` and `Normalized_Slope`
+    4. Calculate `Slope_Change`
+    5. Calculate `EMA`, `Long_EMA`
+    6. Calculate `Rebound_Above_EMA` (breakthrough above short-term moving average)
+    7. Calculate `Long_EMA_Downward` (long-term trend decline)
+    8. Calculate `Average_Volatility`
+    9. **Does not determine `Event`, suitable for real-time data**
     
-    :param data: `pd.DataFrame`，包含即時市場數據
-    :param scaler: `MinMaxScaler`，如果提供則使用相同標準化
-    :return: 具有新特徵的 `pd.DataFrame`, `scaler`
+    :param data: `pd.DataFrame`, containing real-time market data
+    :param scaler: `MinMaxScaler`, if provided, use the same standardization
+    :return: `pd.DataFrame` with new features, `scaler`
     """
 
-    # 確保數據足夠計算
+    # Ensure sufficient data for calculation
     if len(data) < max(slope_window, ema_window, avg_vol_window, long_ema_window):
-        raise ValueError("數據不足，請提供更多歷史數據！")
+        raise ValueError("Insufficient data, please provide more historical data!")
 
-    # 📌 **Step 1: 加入 `ta` 技術指標 與自製alpha**
+    # Step 1: Add `ta` technical indicators and custom alpha factors
     data = add_all_ta_features(
         data, open="open", high="high", low="low", close="close", volume="volume", fillna=True
     )
@@ -39,47 +39,44 @@ def calculate_realtime_features(
     alpha = AlphaFactory(data)
     data = alpha.add_all_alphas(days=[3, 9, 20, 60, 120, 240])
 
-    # 📌 **Step 2: 計算 Bollinger Bands**
+    # Step 2: Calculate Bollinger Bands
     data['Middle_Band'] = data['close'].rolling(window=20).mean()
     data['Std_Dev'] = data['close'].rolling(window=20).std()
     data['Upper_Band'] = data['Middle_Band'] + 2 * data['Std_Dev']
     data['Lower_Band'] = data['Middle_Band'] - 2 * data['Std_Dev']
 
-    # 📌 **Step 3: 計算 `Lower_Band_Slope`**
+    # Step 3: Calculate `Lower_Band_Slope`
     data['Lower_Band_Slope'] = data['Lower_Band'].diff(slope_window) / data['Lower_Band'].shift(slope_window)
     data['Lower_Band_Slope'] = data['Lower_Band_Slope'].fillna(0)
 
-    # 📌 **Step 4: 標準化 `Lower_Band_Slope`**
+    # Step 4: Normalize `Lower_Band_Slope`
     if scaler is None:
         scaler = MinMaxScaler(feature_range=(-1, 1))
-    
-
 
     data['Normalized_Slope'] = scaler.fit_transform(data[['Lower_Band_Slope']])
 
-    # 📌 **Step 5: 計算 `Slope_Change`**
+    # Step 5: Calculate `Slope_Change`
     data['Slope_Change'] = data['Normalized_Slope'] - data['Normalized_Slope'].shift(slope_window)
     data['Slope_Change'] = data['Slope_Change'].fillna(0)
 
-    # 📌 **Step 6: 計算短期 & 長期 `EMA`**
+    # Step 6: Calculate short-term & long-term `EMA`
     data['EMA'] = data['close'].ewm(span=ema_window, adjust=False).mean()
     data['Long_EMA'] = data['close'].ewm(span=long_ema_window, adjust=False).mean()
 
-
-    # 📌 **Step 7: 計算 `Rebound_Above_EMA, Break_Below_EMA`**
+    # Step 7: Calculate `Rebound_Above_EMA, Break_Below_EMA`
     data['Rebound_Above_EMA'] = data['EMA'] > data['Long_EMA']
     data['Break_Below_EMA'] = data['EMA'] < data['Long_EMA']
 
-    # 📌 **Step 8: 計算 `Long_EMA_Downward`**
+    # Step 8: Calculate `Long_EMA_Downward`
     data['Long_EMA_Downward'] = data['Long_EMA'].diff() < 0
 
-    # 📌 **Step 9: 計算短期平均波動率(利用成交量衡量)**
+    # Step 9: Calculate short-term average volatility (measured using volume)
     data['Average_Volatility_short'] = data['volume'].diff().abs().rolling(window=3).mean()
 
-    # 📌 **Step 10: 計算中期平均波動率(利用成交量衡量)**
+    # Step 10: Calculate medium-term average volatility (measured using volume)
     data['Average_Volatility_long'] = data['volume'].diff().abs().rolling(window=9).mean()
 
-    # **確保 data 是 DataFrame**
+    # Ensure data is a DataFrame
     if not isinstance(data, pd.DataFrame):
         data = pd.DataFrame(data)
 
@@ -95,11 +92,11 @@ class FeatureEngineering:
     def __init__(self, variance_threshold=0.005, lasso_eps=1e-4, corr_threshold=0.90, remove_column_name=None,
                  selected_features=None, scaler=None):
         """
-        初始化 Feature Engineering
-        :param variance_threshold: 變異數閾值 (越低保留特徵越多)
-        :param lasso_eps: Lasso 參數 (影響特徵選擇數量)
-        :param corr_threshold: 高相關性特徵閾值
-        :param remove_column_name: 需要移除的特徵名稱
+        Initialize Feature Engineering
+        :param variance_threshold: Variance threshold (lower value retains more features)
+        :param lasso_eps: Lasso parameter (affects number of features selected)
+        :param corr_threshold: High correlation feature threshold
+        :param remove_column_name: Feature names to remove
         """
         self.variance_threshold = variance_threshold
         self.lasso_eps = lasso_eps
@@ -113,35 +110,35 @@ class FeatureEngineering:
 
     def fit(self, df, target_column='Label'):
         """
-        訓練特徵選擇，適用於歷史數據。
-        :param df: DataFrame，包含所有計算後的技術指標特徵
-        :param target_column: 目標變數名稱（預設為 'Label'）
-        :return: DataFrame，僅保留最佳特徵
+        Train feature selection, suitable for historical data.
+        :param df: DataFrame containing all calculated technical indicator features
+        :param target_column: Target variable name (default: 'Label')
+        :return: DataFrame with only best features retained
         """
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         df.fillna(0, inplace=True)
 
-        # 1️⃣ **移除非特徵列**
+        # Step 1: Remove non-feature columns
         features = df.columns.difference(self.remove_column_name)
         X = df[features]
         y = df[target_column]
 
-        # 2️⃣ **處理 NaN 和 Inf**
+        # Step 2: Handle NaN and Inf
         X.replace([np.inf, -np.inf], np.nan, inplace=True)
         X.dropna(axis=1, inplace=True)
 
-        # 3️⃣ **VarianceThreshold 過濾特徵**
+        # Step 3: VarianceThreshold feature filtering
         self.var_thresh = VarianceThreshold(threshold=self.variance_threshold)
         print(self.variance_threshold)
         X_filtered = self.var_thresh.fit_transform(X)
 
-        # 4️⃣ **確保 `features` 長度與 `X_filtered` 一致**
+        # Step 4: Ensure `features` length matches `X_filtered`
         filtered_features = X.columns[self.var_thresh.get_support()]
         X_filtered = pd.DataFrame(X_filtered, columns=filtered_features)
 
-        print(f"📌 變異數過濾後的特徵數量: {X_filtered.shape[1]}")
+        print(f"Number of features after variance filtering: {X_filtered.shape[1]}")
 
-        # 3️⃣ **Lasso 特徵選擇**
+        # Step 5: Lasso feature selection
         X_scaled = self.scaler.fit_transform(X_filtered)
         self.lasso_model = LassoCV(cv=10, random_state=42, eps=self.lasso_eps, max_iter=1000)
         self.lasso_model.fit(X_scaled, y)
@@ -149,26 +146,26 @@ class FeatureEngineering:
         selected_features = np.array(filtered_features)[self.lasso_model.coef_ != 0]
         X_selected = X_filtered[selected_features]
 
-        # 4️⃣ **過濾高相關性特徵**
+        # Step 6: Filter highly correlated features
         corr_matrix = X_selected.corr().abs()
         upper_tri = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
         to_drop = [column for column in upper_tri.columns if any(upper_tri[column] > self.corr_threshold)]
         X_final = X_selected.drop(columns=to_drop, errors='ignore')
 
         self.selected_features = X_final.columns.tolist()
-        print(f"📌 最終保留的特徵數量: {len(self.selected_features)}")
-        print(f"📌 最終保留的特徵名稱: {self.selected_features}")
+        print(f"Final number of features retained: {len(self.selected_features)}")
+        print(f"Final feature names retained: {self.selected_features}")
 
         return X_final, self.scaler, self.selected_features
 
     def transform(self, df):
-        """ 應用變異數篩選、Lasso 選擇和高相關性過濾到即時數據 """
+        """Apply variance filtering, Lasso selection, and high correlation filtering to real-time data"""
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         df.fillna(0, inplace=True)
         
-        #  **確保特徵順序與 `fit()` 時一致**
+        # Ensure feature order matches `fit()` time
         X = df[self.selected_features]
 
-        #  **標準化處理**
+        # Standardization
         X_scaled = self.scaler.fit_transform(X)
         return pd.DataFrame(X_scaled, columns=self.selected_features)
