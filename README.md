@@ -465,7 +465,7 @@ This project is for learning and research purposes only and does not constitute 
 
 ## 📞 Support
 
-For issues, questions, or contributions, please open an issue on the repository.
+For issues, questions, or contributions, please open an issue on the [GitHub repository](https://github.com/WenyuChiou/Event-Driven-Strategy).
 
 ## 🎯 Roadmap
 
@@ -483,5 +483,9 @@ If you use this project in your research, please cite:
 
 ```
 Trading Event Detection System based on Hydraulic Jump Concept
-https://github.com/yourusername/trading-event-detection
+https://github.com/WenyuChiou/Event-Driven-Strategy
 ```
+
+## 🔗 Repository
+
+**GitHub**: https://github.com/WenyuChiou/Event-Driven-Strategy
