@@ -46,10 +46,10 @@ This natural phenomenon provides the theoretical foundation for our trading stra
 
 ### Step-by-Step Installation
 
-1. **Clone the repository** (if using Git):
+1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd project
+   git clone https://github.com/WenyuChiou/Event-Driven-Strategy.git
+   cd Event-Driven-Strategy
    ```
 
 2. **Create a virtual environment** (recommended):
