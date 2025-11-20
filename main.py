@@ -9,7 +9,7 @@ sys.path.insert(0, src_path)
 
 from examples.model_training import train_model
 from examples.backtesting_example import backtest_model, simulate_real_time_trading, run_comprehensive_backtest
-# 直接导入 MA 策略回测函数
+# Import MA strategy backtesting functions
 from src.ma_strategy import *
 
 
@@ -95,17 +95,17 @@ def main():
     if args.validation_data is None:
         args.validation_data = os.path.join(data_dir, "TX00_validation.xlsx")
     
-    # 替換現有的 MA 策略處理代碼
+    # Handle MA strategy mode
     if args.mode == 'ma_strategy':
         print("\n===== Starting MA Strategy Backtest =====")
         
-        # 設置自定義保存路徑
-        custom_path = r"C:\Users\wenyu\Desktop\trade\investment\python\scrapping\hydraulic jump\project\results\ma_strategy"
+        # Set custom save path using dynamic path construction
+        custom_path = os.path.join(src_path, 'results', 'ma_strategy')
         if not os.path.exists(custom_path):
             os.makedirs(custom_path, exist_ok=True)
         
         try:
-            # 運行MA策略回測，解包返回的元組
+            # Run MA strategy backtest, unpack returned tuple
             metrics_result, df_result = backtest_ma_strategy(
                 data_path=args.validation_data,
                 ma_period=args.ma_period,
@@ -119,7 +119,7 @@ def main():
                 commission=args.commission
             )
             
-            # 打印MA策略指標
+            # Print MA strategy metrics
             print("\nMA Strategy Results:")
             print("-" * 50)
             
@@ -130,10 +130,8 @@ def main():
                     print(f"{key}: {value}")
             
         except Exception as e:
-            print(f"\n執行MA策略時發生錯誤: {str(e)}")
-            print("使用簡化版累積收益比較...")
-            
-
+            print(f"\nError occurred while executing MA strategy: {str(e)}")
+            print("Using simplified cumulative return comparison...")
             
             ma_periods = [3, 5, 10, 15, 20, 30, 50]
             chart_path, results = create_cumulative_comparison_chart(
@@ -143,7 +141,7 @@ def main():
                 custom_path=custom_path
             )
             
-            print(f"\n累積損益比較圖已保存至: {chart_path}")
+            print(f"\nCumulative profit/loss comparison chart saved to: {chart_path}")
         
         print("\nMA Strategy backtest completed successfully!")
         print("\nProgram execution completed!")

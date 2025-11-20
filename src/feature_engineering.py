@@ -1,34 +1,34 @@
 import pandas as pd
-# 導入外部套件的 FeatureEngineering 類和計算函數
+# Import FeatureEngineering class and calculation functions from external package
 from package.FE import FeatureEngineering as PackageFE, calculate_realtime_features
 
 def calculate_features(data, slope_window=3, ema_window=9, 
                        avg_vol_window=9, long_ema_window=13, 
                        scaler=None):
     """
-    使用外部套件的 calculate_realtime_features 函數計算交易特徵。
+    Calculate trading features using the calculate_realtime_features function from external package.
     
     Parameters:
     -----------
     data : pd.DataFrame
-        包含 OHLCV 數據的 DataFrame
+        DataFrame containing OHLCV data
     slope_window : int, default=3
-        計算斜率的窗口大小
+        Window size for calculating slope
     ema_window : int, default=9
-        計算 EMA 的窗口大小
+        Window size for calculating EMA
     avg_vol_window : int, default=9
-        計算平均波動率的窗口大小
+        Window size for calculating average volatility
     long_ema_window : int, default=13
-        計算長期 EMA 的窗口大小
+        Window size for calculating long-term EMA
     scaler : MinMaxScaler, optional
-        已訓練的 scaler，如果提供則使用相同的縮放方式
+        Trained scaler, if provided, use the same scaling method
         
     Returns:
     --------
     tuple
-        (添加了特徵的 DataFrame, 使用的 scaler)
+        (DataFrame with features added, scaler used)
     """
-    # 調用外部套件的函數計算特徵
+    # Call external package function to calculate features
     return calculate_realtime_features(
         data, 
         slope_window=slope_window, 
@@ -40,34 +40,34 @@ def calculate_features(data, slope_window=3, ema_window=9,
 
 class FeatureEngineeringWrapper:
     """
-    特徵工程包裝類，使用外部 PackageFE 並提供額外的功能。
+    Feature engineering wrapper class that uses external PackageFE and provides additional functionality.
     """
     def __init__(self, variance_threshold=0.005, lasso_eps=1e-4, 
                  corr_threshold=0.9, remove_column_name=None,
                  selected_features=None, scaler=None):
         """
-        初始化特徵工程包裝類
+        Initialize feature engineering wrapper class
         
         Parameters:
         -----------
         variance_threshold : float, default=0.005
-            變異數閾值，用於移除低變異數特徵
+            Variance threshold for removing low-variance features
         lasso_eps : float, default=1e-4
-            Lasso 參數，影響特徵選擇數量
+            Lasso parameter that affects the number of features selected
         corr_threshold : float, default=0.9
-            高相關性特徵閾值，用於移除高度相關特徵
+            High correlation threshold for removing highly correlated features
         remove_column_name : list, optional
-            需要移除的特徵名稱
+            Feature names to remove
         selected_features : list, optional
-            已經選定的特徵列表
+            Already selected feature list
         scaler : StandardScaler, optional
-            已訓練的 scaler
+            Trained scaler
         """
         self.remove_column_name = remove_column_name or ['date', 'Profit_Loss_Points', 'Event', 'Label']
         self.selected_features = selected_features or []
         self.scaler = scaler
         
-        # 初始化外部套件的 FeatureEngineering 類
+        # Initialize external package FeatureEngineering class
         self.fe_instance = PackageFE(
             variance_threshold=variance_threshold,
             lasso_eps=lasso_eps,
@@ -79,74 +79,74 @@ class FeatureEngineeringWrapper:
 
     def fit(self, df, target_column='Label'):
         """
-        使用外部套件的 FeatureEngineering 訓練特徵選擇，適用於歷史數據。
+        Train feature selection using external package FeatureEngineering, suitable for historical data.
         
         Parameters:
         -----------
         df : pd.DataFrame
-            包含所有計算後的技術指標特徵的 DataFrame
+            DataFrame containing all calculated technical indicator features
         target_column : str, default='Label'
-            目標變數名稱
+            Target variable name
             
         Returns:
         --------
         tuple
-            (僅保留最佳特徵的 DataFrame, 標準化器, 選擇的特徵列表)
+            (DataFrame with only best features retained, scaler, selected feature list)
         """
         X_final, self.scaler, self.selected_features = self.fe_instance.fit(df, target_column)
         
-        print(f"📌 最終保留的特徵數量: {len(self.selected_features)}")
-        print(f"📌 最終保留的特徵名稱: {self.selected_features}")
+        print(f"Final number of features retained: {len(self.selected_features)}")
+        print(f"Final feature names retained: {self.selected_features}")
         
         return X_final, self.scaler, self.selected_features
 
     def transform(self, df):
         """
-        使用外部套件的 FeatureEngineering 應用特徵選擇和標準化到新數據。
+        Apply feature selection and standardization to new data using external package FeatureEngineering.
         
         Parameters:
         -----------
         df : pd.DataFrame
-            要轉換的數據
+            Data to transform
             
         Returns:
         --------
         pd.DataFrame
-            轉換後的特徵
+            Transformed features
         """
         return self.fe_instance.transform(df)
     
     def save_features(self, path):
         """
-        保存所選特徵到 Excel 文件
+        Save selected features to Excel file
         
         Parameters:
         -----------
         path : str
-            保存路徑
+            Save path
         """
         features = pd.DataFrame(self.selected_features, columns=['feature'])
         features.to_excel(path, index=False)
-        print(f"特徵列表已保存到: {path}")
+        print(f"Feature list saved to: {path}")
     
     @classmethod
     def load_features(cls, path, remove_column_name=None, scaler=None):
         """
-        從文件加載特徵列表
+        Load feature list from file
         
         Parameters:
         -----------
         path : str
-            特徵列表文件路徑
+            Feature list file path
         remove_column_name : list, optional
-            需要移除的特徵名稱
+            Feature names to remove
         scaler : StandardScaler, optional
-            已訓練的 scaler
+            Trained scaler
             
         Returns:
         --------
         FeatureEngineeringWrapper
-            初始化的特徵工程實例
+            Initialized feature engineering instance
         """
         features = pd.read_excel(path)
         feature_list = features['feature'].tolist()
@@ -156,5 +156,5 @@ class FeatureEngineeringWrapper:
                   scaler=scaler)
 
 
-# 為了保持與原有代碼兼容，創建別名
+# Create alias for backward compatibility with existing code
 FeatureEngineering = FeatureEngineeringWrapper

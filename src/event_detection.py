@@ -1,63 +1,64 @@
 import pandas as pd
+from typing import Dict, Any
 
 
-def detect_trading_events(data, profit_loss_window=3, atr_window=14, 
-                          long_profit_threshold=10.0, short_loss_threshold=-10.0,
-                          volume_multiplier=2.0, use_atr_filter=True):
+def detect_trading_events(data: pd.DataFrame, profit_loss_window: int = 3, atr_window: int = 14, 
+                          long_profit_threshold: float = 10.0, short_loss_threshold: float = -10.0,
+                          volume_multiplier: float = 2.0, use_atr_filter: bool = True) -> pd.DataFrame:
     """
-    根據特定條件判定做多和做空事件，並排除特定時間範圍。
+    Detect long and short trading events based on specific conditions, excluding certain time ranges.
     
     Parameters:
     -----------
     data : pd.DataFrame
-        包含價格和技術指標的DataFrame
+        DataFrame containing price and technical indicators
     profit_loss_window : int, default=3
-        計算未來盈虧的時間窗口
+        Time window for calculating future profit/loss
     atr_window : int, default=14
-        計算ATR的時間窗口
+        Time window for calculating ATR
     long_profit_threshold : float, default=10.0
-        做多事件的最低獲利閾值（點數）
+        Minimum profit threshold for long events (in points)
     short_loss_threshold : float, default=-10.0
-        做空事件的最大虧損閾值（點數）
+        Maximum loss threshold for short events (in points)
     volume_multiplier : float, default=2.0
-        相對於平均波動率的成交量倍數閾值
+        Volume multiplier threshold relative to average volatility
     use_atr_filter : bool, default=True
-        是否使用ATR作為額外過濾條件
+        Whether to use ATR as an additional filter condition
         
     Returns:
     --------
     pd.DataFrame
-        添加了事件檢測結果的DataFrame
+        DataFrame with event detection results added
     """
-    # 深度複製避免修改原始資料
+    # Deep copy to avoid modifying original data
     result = data.copy()
     
-    # 確保date欄位是datetime類型
+    # Ensure date column is datetime type
     if not pd.api.types.is_datetime64_any_dtype(result['date']):
         result['date'] = pd.to_datetime(result['date'])
     
-    # 提取時間部分
+    # Extract time component
     result['hour_minute'] = result['date'].dt.strftime('%H:%M')
 
-    # 定義要排除的時間範圍
+    # Define time ranges to exclude
     exclude_times = {
-        "08:45", "08:46", "08:47", "08:48", "08:49",  # 早盤開盤後5分鐘
-        "13:41", "13:42", "13:43", "13:44", "13:45",  # 午盤開盤後5分鐘 
-        "15:00", "15:01", "15:02", "15:03", "15:04",  # 日盤收盤前5分鐘
-        "03:55", "03:56", "03:57", "03:58", "03:59"   # 夜盤收盤前5分鐘
+        "08:45", "08:46", "08:47", "08:48", "08:49",  # First 5 minutes after morning open
+        "13:41", "13:42", "13:43", "13:44", "13:45",  # First 5 minutes after afternoon open
+        "15:00", "15:01", "15:02", "15:03", "15:04",  # Last 5 minutes before day session close
+        "03:55", "03:56", "03:57", "03:58", "03:59"   # Last 5 minutes before night session close
     }
     
-    # 排除特定時段
+    # Exclude specific time periods
     result['Valid_Trading_Time'] = ~result['hour_minute'].isin(exclude_times)
 
-    # 計算未來盈虧
+    # Calculate future profit/loss
     result['Profit_Loss_Points'] = result['close'].shift(-profit_loss_window) - result['close']
 
-    # 確保數值型別正確
+    # Ensure numeric types are correct
     for col in ['high', 'low', 'close']:
         result[col] = result[col].astype('float64')
 
-    # 計算ATR
+    # Calculate ATR
     high = data['high']
     low = data['low']
     close = data['close']
@@ -70,19 +71,18 @@ def detect_trading_events(data, profit_loss_window=3, atr_window=14,
     true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     result['ATR'] = true_range.rolling(window=atr_window).mean()
 
-
-    # 初始化Event欄位
+    # Initialize Event column
     result['Event'] = 0
     
-    # 添加交易時段標記
+    # Add trading session markers
     result['Session'] = 'Unknown'
     result.loc[(result['date'].dt.hour >= 8) & (result['date'].dt.hour < 14), 'Session'] = 'Day'
     result.loc[(result['date'].dt.hour >= 15) | (result['date'].dt.hour < 5), 'Session'] = 'Night'
     
-    # 添加星期幾標記
+    # Add day of week marker
     result['Day_Of_Week'] = result['date'].dt.day_name()
 
-    # 做多事件條件
+    # Long event conditions
     long_conditions = (
         (result['Lower_Band_Slope'] < 0) &
         (result['Slope_Change'] < 0) &
@@ -91,17 +91,17 @@ def detect_trading_events(data, profit_loss_window=3, atr_window=14,
         (result['Profit_Loss_Points'] > long_profit_threshold)
     )
     
-    # 如果啟用ATR過濾
+    # If ATR filter is enabled
     if use_atr_filter:
         long_conditions &= (result['Profit_Loss_Points'] > result['ATR'])
         
-    # 應用交易時間過濾
+    # Apply trading time filter
     long_conditions &= result['Valid_Trading_Time']
     
-    # 標記做多事件
+    # Mark long events
     result.loc[long_conditions, 'Event'] = 1
 
-    # 做空事件條件
+    # Short event conditions
     short_conditions = (
         (result['Lower_Band_Slope'] > 0) &
         (result['Slope_Change'] > 0) &
@@ -110,71 +110,70 @@ def detect_trading_events(data, profit_loss_window=3, atr_window=14,
         (result['Profit_Loss_Points'] < short_loss_threshold)
     )
     
-    # 如果啟用ATR過濾
+    # If ATR filter is enabled
     if use_atr_filter:
         short_conditions &= (abs(result['Profit_Loss_Points']) > result['ATR'])
         
-    # 應用交易時間過濾
+    # Apply trading time filter
     short_conditions &= result['Valid_Trading_Time']
     
-    # 標記做空事件
+    # Mark short events
     result.loc[short_conditions, 'Event'] = -1
 
-    # 設置Label等於Event
+    # Set Label equal to Event
     result['Label'] = result['Event']
     
-    # 添加事件分類
+    # Add event classification
     result['Event_Type'] = 'None'
     result.loc[result['Event'] == 1, 'Event_Type'] = 'Long'
     result.loc[result['Event'] == -1, 'Event_Type'] = 'Short'
-    
 
     return result
 
-def analyze_trading_events(data):
+def analyze_trading_events(data: pd.DataFrame) -> Dict[str, Any]:
     """
-    分析交易事件並生成統計數據。
+    Analyze trading events and generate statistics.
     
     Parameters:
     -----------
     data : pd.DataFrame
-        包含檢測到的交易事件的DataFrame
+        DataFrame containing detected trading events
         
     Returns:
     --------
     Dict
-        包含分析結果的字典
+        Dictionary containing analysis results
     """
-    # 篩選有事件的資料
+    # Filter data with events
     events = data[data['Event'] != 0]
     total_events = len(events)
     
     if total_events == 0:
-        return {"error": "沒有檢測到事件"}
+        return {"error": "No events detected"}
     
-    # 計算做多和做空事件
+    # Calculate long and short events
     long_events = len(data[data['Event'] == 1])
     short_events = len(data[data['Event'] == -1])
     
-    # 計算盈虧統計
+    # Calculate profit/loss statistics
     long_stats = data[data['Event'] == 1]['Profit_Loss_Points'].describe()
     short_stats = data[data['Event'] == -1]['Profit_Loss_Points'].describe()
     all_stats = events['Profit_Loss_Points'].describe()
     
-    # 計算勝率
+    # Calculate win rate
     wins = len(events[events['Profit_Loss_Points'] > 0])
     losses = len(events[events['Profit_Loss_Points'] < 0])
     win_rate = wins / total_events if total_events > 0 else 0
     
-    # 計算盈虧比
+    # Calculate profit factor
     total_profit = events[events['Profit_Loss_Points'] > 0]['Profit_Loss_Points'].sum()
     total_loss = abs(events[events['Profit_Loss_Points'] < 0]['Profit_Loss_Points'].sum())
     profit_factor = total_profit / total_loss if total_loss > 0 else float('inf')
     
-    # 計算期望值
+    # Calculate expectancy
     expectancy = events['Profit_Loss_Points'].mean()
     
-    # 時間分析
+    # Time analysis
     by_day = events.groupby('Day_Of_Week')['Event'].count().to_dict()
     by_session = events.groupby('Session')['Event'].count().to_dict()
     by_hour = events.groupby(events['date'].dt.hour)['Event'].count().to_dict()
