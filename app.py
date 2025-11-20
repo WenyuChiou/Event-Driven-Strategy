@@ -63,12 +63,57 @@ elif app_mode == "Data Upload":
     uploaded_file = st.file_uploader("Upload your financial data (CSV or Excel)", type=['csv', 'xlsx'])
     
     if uploaded_file is not None:
-        # Try to read the file
+        # Try to read the file with progress bar
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
         try:
+            status_text.text("Reading file...")
+            progress_bar.progress(20)
+            
             if uploaded_file.name.endswith('.csv'):
                 df = pd.read_csv(uploaded_file)
             else:
                 df = pd.read_excel(uploaded_file)
+            
+            progress_bar.progress(50)
+            status_text.text("Validating data...")
+            
+            # Validate data using validation module
+            try:
+                from src.validation import validate_dataframe, validate_ohlcv_data, ValidationError
+                
+                # Basic validation
+                df = validate_dataframe(df, min_rows=1, check_nulls=False)
+                
+                # Check column names (case-insensitive)
+                column_mapping = {}
+                required_columns_lower = ['open', 'high', 'low', 'close', 'volume']
+                for col in df.columns:
+                    col_lower = col.lower()
+                    if col_lower in required_columns_lower:
+                        column_mapping[col] = col_lower
+                
+                # Rename columns to lowercase for validation
+                df_renamed = df.rename(columns={k: v for k, v in column_mapping.items()})
+                
+                # Validate OHLCV data if all columns present
+                if all(col in df_renamed.columns for col in required_columns_lower):
+                    df_renamed = validate_ohlcv_data(df_renamed)
+                    st.success("✅ Data validation passed!")
+                else:
+                    missing = [col for col in required_columns_lower if col not in df_renamed.columns]
+                    st.warning(f"⚠️ Missing required columns: {', '.join(missing)}")
+                    
+            except ValidationError as ve:
+                st.error(f"❌ Data validation error: {str(ve)}")
+                st.stop()
+            except ImportError:
+                # Fallback if validation module not available
+                pass
+            
+            progress_bar.progress(80)
+            status_text.text("Preparing display...")
             
             # Save the dataframe to session state for use in other sections
             st.session_state['data'] = df
@@ -103,9 +148,25 @@ elif app_mode == "Data Upload":
                 ))
                 fig.update_layout(title="Price Chart", xaxis_title="Date", yaxis_title="Price")
                 st.plotly_chart(fig, use_container_width=True)
+            
+            progress_bar.progress(100)
+            status_text.text("✅ File loaded successfully!")
+            progress_bar.empty()
+            status_text.empty()
                 
+        except pd.errors.EmptyDataError:
+            st.error("❌ Error: The uploaded file is empty.")
+            progress_bar.empty()
+            status_text.empty()
+        except pd.errors.ParserError as e:
+            st.error(f"❌ Error parsing file: {str(e)}")
+            progress_bar.empty()
+            status_text.empty()
         except Exception as e:
-            st.error(f"Error loading file: {e}")
+            st.error(f"❌ Error loading file: {str(e)}")
+            st.exception(e)
+            progress_bar.empty()
+            status_text.empty()
 
 elif app_mode == "Event Detection":
     # Event detection implementation
