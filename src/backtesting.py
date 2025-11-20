@@ -1655,18 +1655,12 @@ def filter_and_compare_strategies(data, threshold_pairs=None, filter_criteria=No
         
         print(f"Generated {len(threshold_pairs)} threshold combinations to test")
     
-    # Test all threshold pairs
-    start_time = time.time()
-    all_results = []
-    all_backtesters = {}
-    cumulative_pnl_dict = {}
+    # Test all threshold pairs with parallel processing
+    from joblib import Parallel, delayed
+    import multiprocessing
     
-    for idx, (long_threshold, short_threshold) in enumerate(threshold_pairs):
-        if idx % 10 == 0:
-            elapsed = time.time() - start_time
-            remaining = elapsed / (idx + 1) * (len(threshold_pairs) - idx - 1)
-            print(f"Progress: {idx+1}/{len(threshold_pairs)} - Elapsed: {elapsed:.1f}s - Est. Remaining: {remaining:.1f}s")
-        
+    def evaluate_strategy(long_threshold, short_threshold):
+        """Helper function to evaluate a single strategy (for parallel processing)"""
         # Create and run strategy
         strategy = ProbabilityThresholdStrategy(
             long_threshold=long_threshold,
@@ -1675,7 +1669,7 @@ def filter_and_compare_strategies(data, threshold_pairs=None, filter_criteria=No
         )
         
         backtester = Backtester(profit_loss_window=holding_period)
-        backtester.run(data, strategy)
+        backtester.run(data.copy(), strategy)  # Use copy to avoid data sharing issues
         metrics = backtester.calculate_metrics()
         
         # Add threshold values to metrics
@@ -1688,20 +1682,45 @@ def filter_and_compare_strategies(data, threshold_pairs=None, filter_criteria=No
         elif 'PnL/MaxDD' not in metrics:
             metrics['PnL/MaxDD'] = float('inf') if metrics['Total PnL'] > 0 else 0
         
-        # Store results
-        all_results.append(metrics)
-        
-        # Store backtester for later use
-        key = (long_threshold, short_threshold)
-        all_backtesters[key] = backtester
-        
         # Store cumulative PnL for later plotting
         if 'Cumulative_Return' in backtester.results:
-            cumulative_pnl_dict[key] = backtester.results['Cumulative_Return']
+            cumulative_return = backtester.results['Cumulative_Return']
         else:
             # Calculate if not already present
             initial_capital = 100000
-            cumulative_pnl_dict[key] = (backtester.results['Cumulative_PnL'] / initial_capital) * 100
+            cumulative_return = (backtester.results['Cumulative_PnL'] / initial_capital) * 100
+        
+        return {
+            'metrics': metrics,
+            'backtester': backtester,
+            'key': (long_threshold, short_threshold),
+            'cumulative_return': cumulative_return
+        }
+    
+    # Determine number of parallel jobs (use all available CPUs, but cap at number of threshold pairs)
+    n_jobs = min(multiprocessing.cpu_count(), len(threshold_pairs))
+    
+    print(f"Running {len(threshold_pairs)} strategy evaluations in parallel using {n_jobs} cores...")
+    start_time = time.time()
+    
+    # Run parallel evaluation
+    results_list = Parallel(n_jobs=n_jobs, verbose=1)(
+        delayed(evaluate_strategy)(long_threshold, short_threshold)
+        for long_threshold, short_threshold in threshold_pairs
+    )
+    
+    elapsed = time.time() - start_time
+    print(f"Completed {len(threshold_pairs)} evaluations in {elapsed:.1f}s")
+    
+    # Unpack results
+    all_results = []
+    all_backtesters = {}
+    cumulative_pnl_dict = {}
+    
+    for result in results_list:
+        all_results.append(result['metrics'])
+        all_backtesters[result['key']] = result['backtester']
+        cumulative_pnl_dict[result['key']] = result['cumulative_return']
     
     # Convert to DataFrame
     results_df = pd.DataFrame(all_results)
